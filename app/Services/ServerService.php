@@ -1,0 +1,158 @@
+<?php
+
+namespace App\Services;
+
+use App\Models\Host;
+use App\Models\Server;
+use App\Models\Game;
+use phpseclib3\Net\SSH2;
+use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Str;
+
+class ServerService
+{
+    private function escapeLinuxArg($string)
+    {
+        return "'" . str_replace("'", "'\\''", $string) . "'";
+    }
+
+    public function getSSH(Host $host)
+    {
+        $ssh = new SSH2($host->hostname, $host->port, 10);
+        
+        $password = $host->password;
+        try {
+            $password = Crypt::decryptString($host->password);
+        } catch (\Exception $e) {
+            $password = $host->password;
+        }
+
+        if (!$ssh->login($host->username, $password)) {
+            throw new \Exception("SSH Authentication Failed to Host: " . $host->name);
+        }
+        return $ssh;
+    }
+
+    public function provisionServer(Server $server, string $password)
+    {
+        $host = $server->host;
+        $game = $server->game;
+        $username = $this->escapeLinuxArg($server->ftp_username);
+        $baseLoc = $this->escapeLinuxArg($game->base_location);
+        $homeDir = $this->escapeLinuxArg("/home/{$server->ftp_username}");
+        $passwordEscaped = $this->escapeLinuxArg($server->ftp_username . ':' . $password);
+
+        $ssh = $this->getSSH($host);
+
+        $output = $ssh->exec("useradd -m -d {$homeDir} -s /bin/bash {$username}");
+        if ($ssh->getExitStatus() !== 0) throw new \Exception("Failed to create user: " . $output);
+
+        $output = $ssh->exec("echo {$passwordEscaped} | chpasswd");
+        if ($ssh->getExitStatus() !== 0) throw new \Exception("Failed to set password: " . $output);
+
+        $output = $ssh->exec("cp -R {$baseLoc}/* {$homeDir}/");
+        if ($ssh->getExitStatus() !== 0) throw new \Exception("Failed to copy game files. Make sure the base location exists on the host! Output: " . $output);
+
+        $ssh->exec("chown -R {$username}:{$username} {$homeDir}/");
+    }
+
+    public function startServer(Server $server)
+    {
+        $host = $server->host;
+        $ssh = $this->getSSH($host);
+        
+        $username = $server->ftp_username;
+        $screenName = str_replace(' ', '_', $server->name);
+        $homeDir = "/home/{$username}";
+        
+        $rconPass = $server->rcon_password;
+        try {
+            $rconPass = Crypt::decryptString($server->rcon_password);
+        } catch (\Exception $e) {
+            $rconPass = $server->rcon_password;
+        }
+
+        $clean_rcon = $this->escapeLinuxArg($rconPass);
+        $clean_name = $this->escapeLinuxArg($server->name);
+
+        $base_script = $server->start_script ?: $server->game->start_script;
+
+        $script = str_replace(
+            ['{server_port}', '{port}', '{server_port_gold}', '{max_clients}', '{clients}', '{rconpassword}', '{rcon_password}', '{server_account}', '{server_name}'],
+            [$server->port, $server->port, $server->port_gold ?? $server->port, $server->max_clients, $server->max_clients, $clean_rcon, $clean_rcon, $username, $clean_name],
+            $base_script
+        );
+
+        $clean_user = $this->escapeLinuxArg($username);
+        $clean_home = $this->escapeLinuxArg($homeDir);
+        $clean_screen = $this->escapeLinuxArg($screenName);
+        
+        $b64Script = base64_encode($script);
+        $escapedB64 = $this->escapeLinuxArg($b64Script);
+
+        $innerBashCommand = "cd {$escapedHomeDir} && rm -f screenlog.0 && echo {$escapedB64} | base64 -d > .server_start.sh && screen -L -dmS {$escapedScreenName} bash .server_start.sh";
+        $command = "su - {$escapedUsername} -c " . $this->escapeLinuxArg($innerBashCommand);
+        $output = $ssh->exec($command);
+        
+        if ($ssh->getExitStatus() !== 0) {
+            throw new \Exception("Command failed to execute: " . $output);
+        }
+
+        usleep(1500000);
+
+        if ($this->getServerStatus($server) !== 'Running') {
+            $logOutput = trim($ssh->exec("su - {$escapedUsername} -c " . $this->escapeLinuxArg("cat {$escapedHomeDir}/screenlog.0 2>/dev/null")));
+            if (empty($logOutput)) {
+                $logOutput = "(No terminal output captured. This usually means the executable is completely missing, has a syntax error, or permission was denied.)";
+            }
+            throw new \Exception("Terminal Error: " . $logOutput);
+        }
+    }
+
+    public function stopServer(Server $server)
+    {
+        $host = $server->host;
+        $ssh = $this->getSSH($host);
+        
+        $escapedUsername = $this->escapeLinuxArg($server->ftp_username);
+        $escapedScreenName = $this->escapeLinuxArg(str_replace(' ', '_', $server->name));
+
+        $command = "su - {$escapedUsername} -c " . $this->escapeLinuxArg("screen -S {$escapedScreenName} -X quit");
+        $ssh->exec($command);
+    }
+
+    public function destroyServer(Server $server)
+    {
+        try {
+            $host = $server->host;
+            $ssh = $this->getSSH($host);
+            
+            $username = $this->escapeLinuxArg($server->ftp_username);
+            $screenName = $this->escapeLinuxArg(str_replace(' ', '_', $server->name));
+
+            $ssh->exec("su - {$username} -c " . $this->escapeLinuxArg("screen -S {$screenName} -X quit"));
+            
+            usleep(500000); 
+
+            $ssh->exec("pkill -u {$username}");
+
+            $ssh->exec("userdel -r {$username}");
+        } catch (\Exception $e) {
+        }
+    }
+
+    public function getServerStatus(Server $server)
+    {
+        try {
+            $host = $server->host;
+            $ssh = $this->getSSH($host);
+            $username = $this->escapeLinuxArg($server->ftp_username);
+
+            $rawScreenName = str_replace(' ', '_', $server->name);
+            $output = $ssh->exec("su - {$username} -c 'screen -ls'");
+            return strpos($output, '.' . $rawScreenName) !== false ? 'Running' : 'Stopped';
+        } catch (\Exception $e) {
+            return 'Error';
+        }
+    }
+}
