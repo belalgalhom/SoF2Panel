@@ -5,7 +5,7 @@
 
 <br>
 
-SOF2Panel is a premium, web-based management dashboard designed to seamlessly provision, control, and manage Soldier of Fortune 2 game servers across multiple Linux nodes. Built with Laravel 11, it features a stunning dark-mode glassmorphism UI, Granular User Permissions, Web FTP, Live Player Monitoring, and an automated task scheduler.
+SOF2Panel is a premium, web-based management dashboard designed to seamlessly provision, control, and manage Soldier of Fortune 2 game servers across multiple Linux nodes. Built with Laravel 11, it features a stunning dark-mode glassmorphism UI, Granular User Permissions, Web FTP, and Live Player Monitoring.
 
 ## ✨ Key Features
 
@@ -15,7 +15,7 @@ SOF2Panel is a premium, web-based management dashboard designed to seamlessly pr
 - **Live Player Monitoring**: View real-time player counts and server status directly from the dashboard.
 - **Web FTP File Manager**: Browse, upload, download, and manage your `.cfg` and `.pk3` files directly from the browser without needing FileZilla.
 - **Web RCON Console**: Instantly send RCON commands (kick, map change, status) to your running server via the web interface.
-- **Advanced Task Scheduler**: Automate your servers with Global and Server-Specific schedules. Setup cron-like tasks to automatically Restart the server, Start/Stop it, or send Custom RCON commands (e.g. broadcasting a message every hour).
+
 - **Powerful REST API**: Admins can generate secure API keys to integrate their servers with Discord bots or external billing systems. The API supports fetching server data, starting/stopping/restarting servers, and sending RCON commands directly via HTTP requests—all completely logged and audited.
 
 ---
@@ -67,7 +67,7 @@ SOF2Panel is a premium, web-based management dashboard designed to seamlessly pr
    Simply point your web server (Nginx/Apache) to the `public` directory, and open your panel's URL in a web browser.
    The built-in **Setup Wizard** will automatically guide you through configuring your database, running migrations, and creating your first Admin account!
 
-5. **Start the Cron Worker (Crucial for Server Monitoring & Schedules)**
+5. **Start the Cron Worker (Crucial for Server Monitoring)**
    Add the following line to your server's crontab (`crontab -e`):
    ```bash
    * * * * * cd /path/to/sof2panel && php artisan schedule:run >> /dev/null 2>&1

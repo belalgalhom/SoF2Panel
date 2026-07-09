@@ -44,7 +44,6 @@ class Server extends Model
             'view_rcon_password',
             'view_logs',
             'manage_server_users',
-            'manage_schedules',
             'manage_settings'
         ])->withTimestamps();
     }
