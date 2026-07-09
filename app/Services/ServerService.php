@@ -90,8 +90,8 @@ class ServerService
         $b64Script = base64_encode($script);
         $escapedB64 = $this->escapeLinuxArg($b64Script);
 
-        $innerBashCommand = "cd {$escapedHomeDir} && rm -f screenlog.0 && echo {$escapedB64} | base64 -d > .server_start.sh && screen -L -dmS {$escapedScreenName} bash .server_start.sh";
-        $command = "su - {$escapedUsername} -c " . $this->escapeLinuxArg($innerBashCommand);
+        $innerBashCommand = "cd {$clean_home} && rm -f screenlog.0 && echo {$escapedB64} | base64 -d > .server_start.sh && screen -L -dmS {$clean_screen} bash .server_start.sh";
+        $command = "su - {$clean_user} -c " . $this->escapeLinuxArg($innerBashCommand);
         $output = $ssh->exec($command);
         
         if ($ssh->getExitStatus() !== 0) {
@@ -101,7 +101,7 @@ class ServerService
         usleep(1500000);
 
         if ($this->getServerStatus($server) !== 'Running') {
-            $logOutput = trim($ssh->exec("su - {$escapedUsername} -c " . $this->escapeLinuxArg("cat {$escapedHomeDir}/screenlog.0 2>/dev/null")));
+            $logOutput = trim($ssh->exec("su - {$clean_user} -c " . $this->escapeLinuxArg("cat {$clean_home}/screenlog.0 2>/dev/null")));
             if (empty($logOutput)) {
                 $logOutput = "(No terminal output captured. This usually means the executable is completely missing, has a syntax error, or permission was denied.)";
             }
