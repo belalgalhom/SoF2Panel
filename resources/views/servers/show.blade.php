@@ -96,11 +96,8 @@
                 <div style="margin-top: 1.5rem; display: flex; flex-direction: column; gap: 1rem;">
                     @if(auth()->user()->isAdmin() || (auth()->user()->servers()->where('server_id', $server->id)->first()?->pivot->view_ftp_credentials))
                     <div style="display: flex; gap: 0.5rem; align-items: center;">
-                        <button id="viewFtpBtn" class="btn" style="border: 1px solid var(--border); color: var(--text-main); background: rgba(255,255,255,0.02); width: 100%; text-align: left; padding: 0.75rem 1rem;" onclick="document.getElementById('viewFtpBtn').style.display='none'; document.getElementById('ftpCreds').style.display='flex';">
-                            <i data-feather="lock" style="width: 16px; height: 16px; margin-right: 0.5rem; vertical-align: middle;"></i> View FTP Credentials
-                        </button>
-                        <div id="ftpCreds" style="display: none; padding: 0.75rem 1rem; background: rgba(0,0,0,0.2); border: 1px solid var(--border); border-radius: 6px; font-family: monospace; flex: 1; align-items: center; justify-content: space-between;">
-                            <span>User: {{ $server->ftp_username }} <span style="color:var(--text-muted)">|</span> Pass: <span style="user-select: all; color: var(--success);">{{ \Illuminate\Support\Facades\Crypt::decryptString($server->ftp_password) }}</span></span>
+                        <div id="ftpCreds" style="display: flex; padding: 0.75rem 1rem; background: rgba(0,0,0,0.2); border: 1px solid var(--border); border-radius: 6px; font-family: monospace; flex: 1; align-items: center; justify-content: space-between;">
+                            <span><i data-feather="lock" style="width: 14px; height: 14px; margin-right: 0.5rem; color: var(--text-muted);"></i> FTP User: {{ $server->ftp_username }} <span style="color:var(--text-muted)">|</span> Pass: <span style="user-select: all; color: var(--success);">{{ \Illuminate\Support\Facades\Crypt::decryptString($server->ftp_password) }}</span></span>
                             <button class="btn" style="width: auto; background: transparent; color: var(--text-muted); padding: 0; border: none; margin-left: 0.5rem;" onclick="copyToClipboard('{{ \Illuminate\Support\Facades\Crypt::decryptString($server->ftp_password) }}')" title="Copy Password"><i data-feather="copy" style="width: 16px; height: 16px;"></i></button>
                         </div>
                         @if(auth()->user()->isAdmin() || (auth()->user()->servers()->where('server_id', $server->id)->first()?->pivot->manage_server_users))
@@ -111,11 +108,8 @@
                     
                     @if(auth()->user()->isAdmin() || (auth()->user()->servers()->where('server_id', $server->id)->first()?->pivot->view_rcon_password))
                     <div style="display: flex; gap: 0.5rem; align-items: center;">
-                        <button id="viewRconBtn" class="btn" style="border: 1px solid var(--border); color: var(--text-main); background: rgba(255,255,255,0.02); width: 100%; text-align: left; padding: 0.75rem 1rem;" onclick="document.getElementById('viewRconBtn').style.display='none'; document.getElementById('rconCreds').style.display='flex';">
-                            <i data-feather="key" style="width: 16px; height: 16px; margin-right: 0.5rem; vertical-align: middle;"></i> View RCON Password
-                        </button>
-                        <div id="rconCreds" style="display: none; padding: 0.75rem 1rem; background: rgba(0,0,0,0.2); border: 1px solid var(--border); border-radius: 6px; font-family: monospace; flex: 1; align-items: center; justify-content: space-between;">
-                            <span>Pass: <span style="user-select: all; color: var(--success);">{{ \Illuminate\Support\Facades\Crypt::decryptString($server->rcon_password) }}</span></span>
+                        <div id="rconCreds" style="display: flex; padding: 0.75rem 1rem; background: rgba(0,0,0,0.2); border: 1px solid var(--border); border-radius: 6px; font-family: monospace; flex: 1; align-items: center; justify-content: space-between;">
+                            <span><i data-feather="key" style="width: 14px; height: 14px; margin-right: 0.5rem; color: var(--text-muted);"></i> RCON Pass: <span style="user-select: all; color: var(--success);">{{ \Illuminate\Support\Facades\Crypt::decryptString($server->rcon_password) }}</span></span>
                             <button class="btn" style="width: auto; background: transparent; color: var(--text-muted); padding: 0; border: none; margin-left: 0.5rem;" onclick="copyToClipboard('{{ \Illuminate\Support\Facades\Crypt::decryptString($server->rcon_password) }}')" title="Copy Password"><i data-feather="copy" style="width: 16px; height: 16px;"></i></button>
                         </div>
                         @if(auth()->user()->isAdmin() || (auth()->user()->servers()->where('server_id', $server->id)->first()?->pivot->manage_server_users))

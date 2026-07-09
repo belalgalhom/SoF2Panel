@@ -141,4 +141,45 @@
     </div>
     @endforeach
 
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('input[name="view_rcon_password"]').forEach(function(checkbox) {
+                checkbox.addEventListener('change', function() {
+                    if(this.checked) {
+                        let form = this.closest('form');
+                        let webRcon = form.querySelector('input[name="use_web_rcon"]');
+                        if(webRcon) webRcon.checked = true;
+                    }
+                });
+            });
+            document.querySelectorAll('input[name="use_web_rcon"]').forEach(function(checkbox) {
+                checkbox.addEventListener('change', function() {
+                    if(this.checked) {
+                        let form = this.closest('form');
+                        let viewRcon = form.querySelector('input[name="view_rcon_password"]');
+                        if(viewRcon) viewRcon.checked = true;
+                    }
+                });
+            });
+            
+            document.querySelectorAll('input[name="view_ftp_credentials"]').forEach(function(checkbox) {
+                checkbox.addEventListener('change', function() {
+                    if(this.checked) {
+                        let form = this.closest('form');
+                        let useFtp = form.querySelector('input[name="use_ftp"]');
+                        if(useFtp) useFtp.checked = true;
+                    }
+                });
+            });
+            document.querySelectorAll('input[name="use_ftp"]').forEach(function(checkbox) {
+                checkbox.addEventListener('change', function() {
+                    if(this.checked) {
+                        let form = this.closest('form');
+                        let viewFtp = form.querySelector('input[name="view_ftp_credentials"]');
+                        if(viewFtp) viewFtp.checked = true;
+                    }
+                });
+            });
+        });
+    </script>
 @endsection
