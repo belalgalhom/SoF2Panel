@@ -148,8 +148,8 @@
             @endif
             
             @if(auth()->user()->isAdmin() || (auth()->user()->servers()->where('server_id', $server->id)->first()?->pivot->manage_settings))
-            <a href="{{ route('servers.backups', $server) }}" class="btn" style="border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.2); justify-content: flex-start; color: #fff;">
-                <i data-feather="hard-drive" style="width: 18px; height: 18px; margin-right: 0.5rem; color: var(--primary);"></i> Backups
+            <a href="{{ route('servers.backups', $server) }}" class="btn btn-primary" style="width: auto; background: #8b5cf6; color: #fff; padding: 0.5rem 1rem; border: none;">
+                <i data-feather="hard-drive" style="width: 16px; height: 16px; margin-right: 0.5rem;"></i> Backups
             </a>
             @endif
             
