@@ -15,6 +15,7 @@ SOF2Panel is a premium, web-based management dashboard designed to seamlessly pr
 - **Live Player Monitoring**: View real-time player counts and server status directly from the dashboard.
 - **Web FTP File Manager**: Browse, upload, download, and manage your `.cfg` and `.pk3` files directly from the browser without needing FileZilla.
 - **Web RCON Console**: Instantly send RCON commands (kick, map change, status) to your running server via the web interface.
+- **Automated Incremental Backups**: Schedule space-saving automatic backups for your game servers using native Linux hard links. Includes a 1-click restoration engine.
 
 - **Powerful REST API**: Admins can generate secure API keys to integrate their servers with Discord bots or external billing systems. The API supports fetching server data, starting/stopping/restarting servers, and sending RCON commands directly via HTTP requests—all completely logged and audited.
 
