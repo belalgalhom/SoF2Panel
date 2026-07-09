@@ -140,6 +140,8 @@ class ServerService
 
         $newFolderName = "backup_" . date('Ymd_His');
         
+        $ssh->setTimeout(0);
+        
         $command = "su - {$username} -c 'rsync -a --delete --exclude=\"backups\" --exclude=\".*\" {$linkDest} /home/{$cleanUsername}/ {$backupDir}/{$newFolderName}/'";
         $ssh->exec($command);
         
@@ -167,6 +169,8 @@ class ServerService
             $this->stopServer($server);
             sleep(1);
         }
+
+        $ssh->setTimeout(0);
 
         $command = "su - {$username} -c 'rsync -a --delete --exclude=\"backups\" --exclude=\".*\" {$backupDir}/ /home/{$cleanUsername}/'";
         $ssh->exec($command);
