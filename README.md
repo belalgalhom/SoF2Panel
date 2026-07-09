@@ -70,7 +70,7 @@ SOF2Panel is a premium, web-based management dashboard designed to seamlessly pr
 5. **Start the Cron Worker (Crucial for Server Monitoring)**
    Add the following line to your server's crontab (`crontab -e`):
    ```bash
-   * * * * * cd /path/to/sof2panel && php artisan schedule:run >> /dev/null 2>&1
+   * * * * * cd /var/www/sof2panel && php artisan schedule:run >> /dev/null 2>&1
    ```
 
 ---
