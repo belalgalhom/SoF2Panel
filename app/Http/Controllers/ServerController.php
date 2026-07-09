@@ -195,14 +195,40 @@ class ServerController extends Controller
             'auto_restart' => !$server->auto_restart
         ]);
 
+        $status = $server->auto_restart ? 'Enabled' : 'Disabled';
+        
         \App\Models\Log::create([
-            'user_id' => $user->id,
-            'action' => $server->auto_restart ? 'Enabled Auto-Restart' : 'Disabled Auto-Restart',
-            'target' => $server->name,
+            'user_id' => auth()->user()->id,
+            'action' => 'Toggled Auto-Restart',
+            'target' => "{$status} auto-restart for {$server->name}",
             'ip' => request()->ip()
         ]);
 
-        return back()->with('success', 'Auto-restart setting updated successfully.');
+        return back()->with('success', "Auto-restart has been {$status}.");
+    }
+
+    public function updateBackupSettings(Request $request, Server $server)
+    {
+        $this->checkSettingsAccess($server);
+
+        $request->validate([
+            'auto_backup' => 'required|boolean',
+            'backup_interval' => 'required|integer|in:60,180,360,720,1440,2880,4320,10080'
+        ]);
+
+        $server->update([
+            'auto_backup' => $request->auto_backup,
+            'backup_interval' => $request->backup_interval
+        ]);
+
+        \App\Models\Log::create([
+            'user_id' => auth()->user()->id,
+            'action' => 'Updated Backup Settings',
+            'target' => "Updated auto-backup settings for {$server->name}",
+            'ip' => request()->ip()
+        ]);
+
+        return back()->with('success', "Backup settings updated successfully.");
     }
 
     public function updateScript(Request $request, Server $server)

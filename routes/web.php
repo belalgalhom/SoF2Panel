@@ -38,6 +38,7 @@ Route::middleware('auth')->group(function () {
     Route::post('servers/{server}/password/ftp', [\App\Http\Controllers\ServerPasswordController::class, 'updateFtp'])->name('servers.password.ftp');
     Route::post('servers/{server}/password/rcon', [\App\Http\Controllers\ServerPasswordController::class, 'updateRcon'])->name('servers.password.rcon');
     Route::post('servers/{server}/auto-restart', [\App\Http\Controllers\ServerController::class, 'toggleAutoRestart'])->name('servers.auto_restart.toggle');
+    Route::post('servers/{server}/backup-settings', [\App\Http\Controllers\ServerController::class, 'updateBackupSettings'])->name('servers.backup_settings.update');
     Route::post('servers/{server}/script', [\App\Http\Controllers\ServerController::class, 'updateScript'])->name('servers.script.update');
     Route::post('servers/{server}/connection', [\App\Http\Controllers\ServerController::class, 'updateConnection'])->name('servers.connection.update');
     Route::post('servers/{server}/general', [\App\Http\Controllers\ServerController::class, 'updateGeneral'])->name('servers.general.update');
@@ -56,6 +57,12 @@ Route::middleware('auth')->group(function () {
     Route::post('servers/{server}/ftp/rename', [\App\Http\Controllers\WebFtpController::class, 'rename'])->name('servers.ftp.rename');
     Route::get('servers/{server}/ftp/edit', [\App\Http\Controllers\WebFtpController::class, 'edit'])->name('servers.ftp.edit');
     Route::post('servers/{server}/ftp/update', [\App\Http\Controllers\WebFtpController::class, 'update'])->name('servers.ftp.update');
+
+    // Backups
+    Route::get('servers/{server}/backups', [\App\Http\Controllers\BackupController::class, 'index'])->name('servers.backups');
+    Route::post('servers/{server}/backups', [\App\Http\Controllers\BackupController::class, 'store'])->name('servers.backups.store');
+    Route::post('servers/{server}/backups/{backup}/restore', [\App\Http\Controllers\BackupController::class, 'restore'])->name('servers.backups.restore');
+    Route::delete('servers/{server}/backups/{backup}', [\App\Http\Controllers\BackupController::class, 'destroy'])->name('servers.backups.destroy');
 
     // Web RCON
     Route::get('servers/{server}/rcon', [\App\Http\Controllers\WebRconController::class, 'index'])->name('servers.rcon');

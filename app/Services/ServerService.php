@@ -121,6 +121,75 @@ class ServerService
         $ssh->exec($command);
     }
 
+    public function createBackup(Server $server)
+    {
+        $host = $server->host;
+        $ssh = $this->getSSH($host);
+        
+        $username = $this->escapeLinuxArg($server->ftp_username);
+        $cleanUsername = $server->ftp_username;
+        $backupDir = "/home/{$cleanUsername}/backups";
+        
+        $ssh->exec("su - {$username} -c 'mkdir -p {$backupDir}'");
+
+        $latestBackup = $server->backups()->orderBy('created_at', 'desc')->first();
+        $linkDest = '';
+        if ($latestBackup) {
+            $linkDest = "--link-dest={$backupDir}/{$latestBackup->filename}/";
+        }
+
+        $newFolderName = "backup_" . date('Ymd_His');
+        
+        $command = "su - {$username} -c 'rsync -a --delete --exclude=\"backups\" --exclude=\".*\" {$linkDest} /home/{$cleanUsername}/ {$backupDir}/{$newFolderName}/'";
+        $ssh->exec($command);
+        
+        $sizeOutput = trim($ssh->exec("su - {$username} -c 'du -sm {$backupDir}/{$newFolderName} | cut -f1'"));
+        $sizeMb = intval($sizeOutput);
+
+        $server->backups()->create([
+            'filename' => $newFolderName,
+            'size' => $sizeMb * 1024 * 1024,
+        ]);
+        
+        return true;
+    }
+
+    public function restoreBackup(Server $server, \App\Models\Backup $backup)
+    {
+        $host = $server->host;
+        $ssh = $this->getSSH($host);
+        
+        $username = $this->escapeLinuxArg($server->ftp_username);
+        $cleanUsername = $server->ftp_username;
+        $backupDir = "/home/{$cleanUsername}/backups/{$backup->filename}";
+
+        if ($this->getServerStatus($server) === 'Running') {
+            $this->stopServer($server);
+            sleep(1);
+        }
+
+        $command = "su - {$username} -c 'rsync -a --delete --exclude=\"backups\" --exclude=\".*\" {$backupDir}/ /home/{$cleanUsername}/'";
+        $ssh->exec($command);
+
+        return true;
+    }
+
+    public function deleteBackup(Server $server, \App\Models\Backup $backup)
+    {
+        $host = $server->host;
+        $ssh = $this->getSSH($host);
+        
+        $username = $this->escapeLinuxArg($server->ftp_username);
+        $cleanUsername = $server->ftp_username;
+        
+        $command = "su - {$username} -c 'rm -rf /home/{$cleanUsername}/backups/{$backup->filename}'";
+        $ssh->exec($command);
+
+        $backup->delete();
+        
+        return true;
+    }
+
     public function destroyServer(Server $server)
     {
         try {

@@ -20,6 +20,8 @@ class Server extends Model
         'is_active',
         'auto_restart',
         'expected_state',
+        'auto_backup',
+        'backup_interval',
     ];
 
     public function host()
@@ -48,4 +50,8 @@ class Server extends Model
         ])->withTimestamps();
     }
 
+    public function backups()
+    {
+        return $this->hasMany(Backup::class);
+    }
 }

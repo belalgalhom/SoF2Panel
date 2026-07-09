@@ -40,6 +40,41 @@
             </div>
         </div>
 
+
+        <!-- Auto Backup Settings -->
+        <div class="glass-panel" style="width: 100%; max-width: none;">
+            <h3 style="margin-bottom: 1rem;">Automated Backups</h3>
+            <p class="subtitle" style="margin-top: 0; margin-bottom: 1rem; font-size: 0.85rem;">Automatically run space-saving incremental backups on a set schedule.</p>
+            <form method="POST" action="{{ route('servers.backup_settings.update', $server) }}">
+                @csrf
+                <div style="display: flex; gap: 2rem; align-items: center;" class="flex-responsive">
+                    <div class="form-group" style="flex: 1; margin: 0;">
+                        <label class="form-label" style="display: flex; align-items: center; cursor: pointer;">
+                            <input type="hidden" name="auto_backup" value="0">
+                            <input type="checkbox" name="auto_backup" value="1" {{ $server->auto_backup ? 'checked' : '' }} style="margin-right: 0.5rem; width: 18px; height: 18px; accent-color: var(--primary);">
+                            <span style="font-weight: 500;">Enable Automatic Backups</span>
+                        </label>
+                    </div>
+                    <div class="form-group" style="flex: 2; margin: 0;">
+                        <label class="form-label">Backup Interval</label>
+                        <select name="backup_interval" class="form-input" style="cursor: pointer;">
+                            <option value="60" {{ $server->backup_interval == 60 ? 'selected' : '' }}>Every 1 Hour</option>
+                            <option value="180" {{ $server->backup_interval == 180 ? 'selected' : '' }}>Every 3 Hours</option>
+                            <option value="360" {{ $server->backup_interval == 360 ? 'selected' : '' }}>Every 6 Hours</option>
+                            <option value="720" {{ $server->backup_interval == 720 ? 'selected' : '' }}>Every 12 Hours</option>
+                            <option value="1440" {{ $server->backup_interval == 1440 ? 'selected' : '' }}>Every 24 Hours</option>
+                            <option value="2880" {{ $server->backup_interval == 2880 ? 'selected' : '' }}>Every 2 Days</option>
+                            <option value="4320" {{ $server->backup_interval == 4320 ? 'selected' : '' }}>Every 3 Days</option>
+                            <option value="10080" {{ $server->backup_interval == 10080 ? 'selected' : '' }}>Every 1 Week</option>
+                        </select>
+                    </div>
+                </div>
+                <div style="margin-top: 1.5rem;">
+                    <button type="submit" class="btn btn-primary" style="width: auto;">Save Backup Settings</button>
+                </div>
+            </form>
+        </div>
+
         <!-- General Settings -->
         <div class="glass-panel" style="width: 100%; max-width: none;">
             <h3 style="margin-bottom: 1rem;">General Settings</h3>
