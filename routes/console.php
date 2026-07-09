@@ -9,4 +9,4 @@ Artisan::command('inspire', function () {
 })->purpose('Display an inspiring quote')->hourly();
 
 Schedule::command('servers:monitor')->everyMinute();
-Schedule::command('servers:backup')->everyMinute();
+Schedule::command('servers:backup')->everyMinute()->withoutOverlapping();
