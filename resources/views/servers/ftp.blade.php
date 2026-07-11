@@ -62,7 +62,7 @@
                                 <a href="{{ route('servers.ftp.download', ['server' => $server, 'file' => rtrim($path, '/') . '/' . $item['name']]) }}" class="btn" style="padding: 0.25rem 0.5rem; color: var(--primary);" title="Download">
                                     <i data-feather="download" style="width: 16px; height: 16px;"></i>
                                 </a>
-                                @if(in_array(pathinfo($item['name'], PATHINFO_EXTENSION), ['cfg', 'txt', 'ini', 'log', 'json']))
+                                @if(in_array(pathinfo($item['name'], PATHINFO_EXTENSION), ['cfg', 'txt', 'ini', 'log', 'json', 'mvchat', 'ent', 'arena', 'wpn', 'sh']))
                                     <button class="btn" style="padding: 0.25rem 0.5rem; color: var(--success);" title="Edit" onclick="editFile('{{ rtrim($path, '/') . '/' . $item['name'] }}')">
                                         <i data-feather="edit" style="width: 16px; height: 16px;"></i>
                                     </button>
