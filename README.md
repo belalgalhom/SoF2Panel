@@ -17,6 +17,7 @@ SOF2Panel is a premium, web-based management dashboard designed to seamlessly pr
 - **Web RCON Console**: Instantly send RCON commands (kick, map change, status) to your running server via the web interface.
 - **Automated Incremental Backups**: Schedule space-saving automatic backups for your game servers using native Linux hard links. Includes a 1-click restoration engine.
 
+- **External Authentication**: Securely bridge your panel with external databases (like XenForo) to allow users to log in using their forum credentials. Features a strict Admin-only "Import User" workflow with live autocomplete search to keep your panel completely locked down.
 - **Powerful REST API**: Admins can generate secure API keys to integrate their servers with Discord bots or external billing systems. The API supports fetching server data, starting/stopping/restarting servers, and sending RCON commands directly via HTTP requests—all completely logged and audited.
 
 ---
