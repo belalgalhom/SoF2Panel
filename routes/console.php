@@ -8,5 +8,5 @@ Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->purpose('Display an inspiring quote')->hourly();
 
-Schedule::command('servers:monitor')->everyMinute();
+Schedule::command('servers:monitor')->everyMinute()->withoutOverlapping();
 Schedule::command('servers:backup')->everyMinute()->withoutOverlapping();

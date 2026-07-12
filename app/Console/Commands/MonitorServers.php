@@ -35,17 +35,39 @@ class MonitorServers extends Command
         foreach ($servers as $server) {
             $status = $serverService->getServerStatus($server);
             
-            if ($status === 'Stopped' || $status === 'Error') {
-                $serverService->startServer($server);
-                
-                \App\Models\Log::create([
-                    'user_id' => null,
-                    'action' => 'Auto-Restart Server (Cron)',
-                    'target' => $server->name,
-                    'ip' => '127.0.0.1'
-                ]);
+            $needsRestart = false;
 
-                $this->info("Server {$server->name} was down and has been auto-restarted.");
+            if ($status === 'Stopped') {
+                $needsRestart = true;
+            } else if ($status === 'Running') {
+                if (!$serverService->pingServer($server)) {
+                    sleep(5);
+                    if (!$serverService->pingServer($server)) {
+                        $needsRestart = true;
+
+                        try {
+                            $serverService->stopServer($server);
+                            sleep(1);
+                        } catch (\Exception $e) {}
+                    }
+                }
+            }
+
+            if ($needsRestart) {
+                try {
+                    $serverService->startServer($server);
+                    
+                    \App\Models\Log::create([
+                        'user_id' => null,
+                        'action' => 'Auto-Restart Server (Cron)',
+                        'target' => $server->name,
+                        'ip' => '127.0.0.1'
+                    ]);
+
+                    $this->info("Server {$server->name} auto-restarted!");
+                } catch (\Exception $e) {
+                    $this->error("Failed to auto-restart server {$server->name}: " . $e->getMessage());
+                }
             }
         }
     }

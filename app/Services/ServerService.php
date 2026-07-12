@@ -115,9 +115,7 @@ class ServerService
         $ssh = $this->getSSH($host);
         
         $escapedUsername = $this->escapeLinuxArg($server->ftp_username);
-        $escapedScreenName = $this->escapeLinuxArg(str_replace(' ', '_', $server->name));
-
-        $command = "su - {$escapedUsername} -c " . $this->escapeLinuxArg("screen -S {$escapedScreenName} -X quit");
+        $command = "su - {$escapedUsername} -c 'pkill screen'";
         $ssh->exec($command);
     }
 
@@ -221,11 +219,39 @@ class ServerService
             $ssh = $this->getSSH($host);
             $username = $this->escapeLinuxArg($server->ftp_username);
 
-            $rawScreenName = str_replace(' ', '_', $server->name);
             $output = $ssh->exec("su - {$username} -c 'screen -ls'");
-            return strpos($output, '.' . $rawScreenName) !== false ? 'Running' : 'Stopped';
+            return (strpos($output, '(Detached)') !== false || strpos($output, '(Attached)') !== false) ? 'Running' : 'Stopped';
         } catch (\Exception $e) {
             return 'Error';
+        }
+    }
+
+    public function pingServer(Server $server)
+    {
+        try {
+            $host = $server->host->hostname;
+            $port = $server->port;
+            
+            $socket = @fsockopen("udp://$host", $port, $errno, $errstr, 2);
+            if (!$socket) {
+                return false;
+            }
+
+            stream_set_timeout($socket, 1);
+            
+            $packet = "\xff\xff\xff\xffgetinfo";
+            fwrite($socket, $packet);
+            
+            $response = fread($socket, 4096);
+            fclose($socket);
+            
+            if (strpos($response, 'infoResponse') !== false || strpos($response, 'statusResponse') !== false) {
+                return true;
+            }
+            
+            return false;
+        } catch (\Exception $e) {
+            return false;
         }
     }
 }
