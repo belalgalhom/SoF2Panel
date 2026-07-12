@@ -22,7 +22,7 @@ class SettingController extends Controller
             'col_id' => Setting::get('external_auth_col_id', 'user_id'),
             'col_username' => Setting::get('external_auth_col_username', 'username'),
             'col_email' => Setting::get('external_auth_col_email', 'email'),
-            'col_password' => Setting::get('external_auth_col_password', 'password'),
+            'col_password' => Setting::get('external_auth_col_password', 'secret_key'),
         ];
 
         return view('admin.settings.index', compact('externalAuth'));
