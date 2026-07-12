@@ -42,6 +42,23 @@ class UserController extends Controller
         return back()->with('success', 'User created successfully.');
     }
 
+    public function searchExternal(Request $request)
+    {
+        if (!\App\Models\Setting::get('external_auth_enabled', false)) {
+            return response()->json([]);
+        }
+
+        $query = $request->input('q', '');
+        if (strlen($query) < 3) {
+            return response()->json([]);
+        }
+
+        $externalAuth = app(\App\Services\ExternalAuthService::class);
+        $results = $externalAuth->search($query);
+
+        return response()->json($results);
+    }
+
     public function importExternal(Request $request)
     {
         $request->validate([

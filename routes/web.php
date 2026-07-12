@@ -78,6 +78,7 @@ Route::middleware('auth')->group(function () {
     Route::middleware('admin')->group(function () {
         Route::resource('hosts', \App\Http\Controllers\HostController::class)->except(['show', 'edit']);
         Route::resource('games', \App\Http\Controllers\GameController::class)->except(['show']);
+        Route::get('users/search-external', [\App\Http\Controllers\UserController::class, 'searchExternal'])->name('users.search-external');
         Route::post('users/import', [\App\Http\Controllers\UserController::class, 'importExternal'])->name('users.import');
         Route::resource('users', \App\Http\Controllers\UserController::class)->except(['show', 'edit', 'create']);
         Route::get('logs', [\App\Http\Controllers\LogController::class, 'index'])->name('logs.index');

@@ -169,4 +169,59 @@ class ExternalAuthService
             return null;
         }
     }
+
+    /**
+     * Search for users in the external database.
+     * 
+     * @param string $query The search query
+     * @return array Returns an array of matching user objects
+     */
+    public function search($query)
+    {
+        try {
+            $enabled = \App\Models\Setting::get('external_auth_enabled', false);
+            if (!$enabled || strlen($query) < 3) {
+                return [];
+            }
+
+            config(['database.connections.external' => [
+                'driver' => 'mysql',
+                'host' => \App\Models\Setting::get('external_auth_host', '127.0.0.1'),
+                'port' => \App\Models\Setting::get('external_auth_port', '3306'),
+                'database' => \App\Models\Setting::get('external_auth_database', 'xenforo'),
+                'username' => \App\Models\Setting::get('external_auth_username', 'root'),
+                'password' => \App\Models\Setting::get('external_auth_password', ''),
+                'charset' => 'utf8mb4',
+                'collation' => 'utf8mb4_unicode_ci',
+                'prefix' => '',
+                'strict' => false,
+                'engine' => null,
+            ]]);
+
+            DB::purge('external');
+            $db = DB::connection('external');
+
+            $type = \App\Models\Setting::get('external_auth_type', 'XenForo');
+            $table = \App\Models\Setting::get('external_auth_table', $type === 'XenForo' ? 'xf_user' : 'users');
+            $colUsername = \App\Models\Setting::get('external_auth_col_username', 'username');
+            $colEmail = \App\Models\Setting::get('external_auth_col_email', 'email');
+
+            $users = $db->table($table)
+                ->where($colUsername, 'LIKE', "%{$query}%")
+                ->orWhere($colEmail, 'LIKE', "%{$query}%")
+                ->limit(10)
+                ->get();
+
+            return $users->map(function ($user) use ($colUsername, $colEmail) {
+                return (object) [
+                    'username' => $user->{$colUsername},
+                    'email' => $user->{$colEmail}
+                ];
+            })->toArray();
+
+        } catch (\Exception $e) {
+            Log::error('External Auth Search Error: ' . $e->getMessage());
+            return [];
+        }
+    }
 }

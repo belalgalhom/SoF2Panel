@@ -146,9 +146,10 @@
         <form method="POST" action="{{ route('users.import') }}">
             @csrf
             
-            <div class="form-group">
+            <div class="form-group" style="position: relative;">
                 <label class="form-label">External Username or Email</label>
-                <input type="text" name="external_username" class="form-input" required placeholder="e.g. jdoe">
+                <input type="text" name="external_username" id="external_username_input" class="form-input" required placeholder="e.g. jdoe" autocomplete="off">
+                <div id="external_username_results" style="display: none; position: absolute; top: 100%; left: 0; right: 0; background: var(--bg-card); border: 1px solid var(--border); border-radius: 0.5rem; max-height: 200px; overflow-y: auto; z-index: 1000; margin-top: 0.25rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1);"></div>
             </div>
 
             <div class="form-group">
@@ -253,4 +254,65 @@
         document.getElementById('editUserModal').style.display = 'flex';
     }
 </script>
+
+@if(\App\Models\Setting::get('external_auth_enabled', false))
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const input = document.getElementById('external_username_input');
+        const resultsContainer = document.getElementById('external_username_results');
+        let timeout = null;
+
+        input.addEventListener('input', function() {
+            clearTimeout(timeout);
+            const query = this.value.trim();
+
+            if (query.length < 3) {
+                resultsContainer.style.display = 'none';
+                return;
+            }
+
+            timeout = setTimeout(() => {
+                fetch(`/users/search-external?q=${encodeURIComponent(query)}`)
+                    .then(response => response.json())
+                    .then(users => {
+                        resultsContainer.innerHTML = '';
+                        
+                        if (users.length === 0) {
+                            resultsContainer.style.display = 'none';
+                            return;
+                        }
+
+                        users.forEach(user => {
+                            const div = document.createElement('div');
+                            div.style.padding = '0.75rem 1rem';
+                            div.style.cursor = 'pointer';
+                            div.style.borderBottom = '1px solid var(--border)';
+                            div.innerHTML = `<strong style="color: var(--text-main);">${user.username}</strong> <br><small style="color: var(--text-muted);">${user.email}</small>`;
+                            
+                            div.addEventListener('mouseover', () => div.style.background = 'rgba(255,255,255,0.05)');
+                            div.addEventListener('mouseout', () => div.style.background = 'transparent');
+                            
+                            div.addEventListener('click', () => {
+                                input.value = user.username;
+                                resultsContainer.style.display = 'none';
+                            });
+
+                            resultsContainer.appendChild(div);
+                        });
+
+                        resultsContainer.style.display = 'block';
+                    });
+            }, 300);
+        });
+
+        // Hide when clicking outside
+        document.addEventListener('click', function(e) {
+            if (e.target !== input && e.target !== resultsContainer) {
+                resultsContainer.style.display = 'none';
+            }
+        });
+    });
+</script>
+@endif
+
 @endsection
