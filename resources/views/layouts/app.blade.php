@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SOF2Panel - @yield('title', 'Dashboard')</title>
+    <title>{{ \App\Models\Setting::get('app_name', env('APP_NAME', 'SOF2Panel')) }} - @yield('title', 'Dashboard')</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('css/app.css') }}">
     <link rel="stylesheet" href="{{ asset('css/dashboard.css') }}">
@@ -20,7 +20,7 @@
         <!-- Sidebar -->
         <aside class="sidebar">
             <div class="sidebar-header">
-                <h2 class="brand-title" style="margin:0; font-size: 1.5rem;">SOF2Panel</h2>
+                <h2 class="brand-title" style="margin:0; font-size: 1.5rem;">{{ \App\Models\Setting::get('app_name', env('APP_NAME', 'SOF2Panel')) }}</h2>
             </div>
             
             <nav class="sidebar-nav">

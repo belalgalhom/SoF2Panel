@@ -85,6 +85,7 @@ Route::middleware('auth')->group(function () {
         
         // Settings
         Route::get('settings', [\App\Http\Controllers\Admin\SettingController::class, 'index'])->name('admin.settings.index');
+        Route::post('settings/general', [\App\Http\Controllers\Admin\SettingController::class, 'updateGeneral'])->name('admin.settings.general');
         Route::post('settings/external-auth', [\App\Http\Controllers\Admin\SettingController::class, 'updateExternalAuth'])->name('admin.settings.external-auth');
     });
 });

@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SOF2Panel - Login</title>
+    <title>{{ \App\Models\Setting::get('app_name', env('APP_NAME', 'SOF2Panel')) }} - Login</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('css/app.css') }}">
 </head>
 <body>
     <div class="installer-container">
         <div class="glass-panel">
-            <h1 class="brand-title">SOF2Panel</h1>
+            <h1 class="brand-title">{{ \App\Models\Setting::get('app_name', env('APP_NAME', 'SOF2Panel')) }}</h1>
             <h2 class="subtitle">Sign in to your account</h2>
             
             @if(session('error'))

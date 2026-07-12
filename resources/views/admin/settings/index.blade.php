@@ -22,6 +22,26 @@
 
     <div style="display: grid; grid-template-columns: 1fr; gap: 1.5rem; max-width: 900px;">
         <div class="glass-panel" style="width: 100%; max-width: none;">
+            <h3 style="margin-bottom: 0.5rem;">General Settings</h3>
+            <p class="subtitle" style="margin-top: 0; margin-bottom: 1.5rem; font-size: 0.9rem;">
+                Basic panel branding and configuration.
+            </p>
+
+            <form action="{{ route('admin.settings.general') }}" method="POST">
+                @csrf
+                
+                <div class="form-group">
+                    <label class="form-label">Panel Name</label>
+                    <input type="text" class="form-input" name="app_name" value="{{ $general['app_name'] }}" required>
+                </div>
+
+                <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                    <button type="submit" class="btn btn-primary" style="width: auto; padding: 0.75rem 2rem;">Save General Settings</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="glass-panel" style="width: 100%; max-width: none;">
             <h3 style="margin-bottom: 0.5rem;">External Authentication</h3>
             <p class="subtitle" style="margin-top: 0; margin-bottom: 1.5rem; font-size: 0.9rem;">
                 Configure a bridge to authenticate users against an external database like XenForo or a custom website. Users will be automatically imported into this panel on successful login.

@@ -25,7 +25,29 @@ class SettingController extends Controller
             'col_password' => Setting::get('external_auth_col_password', 'secret_key'),
         ];
 
-        return view('admin.settings.index', compact('externalAuth'));
+        $general = [
+            'app_name' => Setting::get('app_name', env('APP_NAME', 'SOF2Panel')),
+        ];
+
+        return view('admin.settings.index', compact('externalAuth', 'general'));
+    }
+
+    public function updateGeneral(Request $request)
+    {
+        $request->validate([
+            'app_name' => 'required|string|max:255',
+        ]);
+
+        Setting::set('app_name', $request->app_name);
+
+        \App\Models\Log::create([
+            'user_id' => auth()->id(),
+            'action' => 'Updated Settings',
+            'target' => 'General Settings',
+            'ip' => request()->ip()
+        ]);
+
+        return back()->with('success', 'General settings updated successfully.');
     }
 
     public function updateExternalAuth(Request $request)
