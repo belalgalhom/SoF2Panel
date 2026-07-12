@@ -22,21 +22,7 @@ class ExternalAuthService
                 return null;
             }
 
-            config(['database.connections.external' => [
-                'driver' => 'mysql',
-                'host' => \App\Models\Setting::get('external_auth_host', '127.0.0.1'),
-                'port' => \App\Models\Setting::get('external_auth_port', '3306'),
-                'database' => \App\Models\Setting::get('external_auth_database', 'xenforo'),
-                'username' => \App\Models\Setting::get('external_auth_username', 'root'),
-                'password' => \App\Models\Setting::get('external_auth_password', ''),
-                'charset' => 'utf8mb4',
-                'collation' => 'utf8mb4_unicode_ci',
-                'prefix' => '',
-                'strict' => false,
-                'engine' => null,
-            ]]);
-
-            DB::purge('external');
+            $this->configureExternalDatabase();
 
             $type = \App\Models\Setting::get('external_auth_type', 'XenForo');
             
@@ -128,21 +114,7 @@ class ExternalAuthService
                 return null;
             }
 
-            config(['database.connections.external' => [
-                'driver' => 'mysql',
-                'host' => \App\Models\Setting::get('external_auth_host', '127.0.0.1'),
-                'port' => \App\Models\Setting::get('external_auth_port', '3306'),
-                'database' => \App\Models\Setting::get('external_auth_database', 'xenforo'),
-                'username' => \App\Models\Setting::get('external_auth_username', 'root'),
-                'password' => \App\Models\Setting::get('external_auth_password', ''),
-                'charset' => 'utf8mb4',
-                'collation' => 'utf8mb4_unicode_ci',
-                'prefix' => '',
-                'strict' => false,
-                'engine' => null,
-            ]]);
-
-            DB::purge('external');
+            $this->configureExternalDatabase();
             $db = DB::connection('external');
 
             $type = \App\Models\Setting::get('external_auth_type', 'XenForo');
@@ -184,21 +156,7 @@ class ExternalAuthService
                 return [];
             }
 
-            config(['database.connections.external' => [
-                'driver' => 'mysql',
-                'host' => \App\Models\Setting::get('external_auth_host', '127.0.0.1'),
-                'port' => \App\Models\Setting::get('external_auth_port', '3306'),
-                'database' => \App\Models\Setting::get('external_auth_database', 'xenforo'),
-                'username' => \App\Models\Setting::get('external_auth_username', 'root'),
-                'password' => \App\Models\Setting::get('external_auth_password', ''),
-                'charset' => 'utf8mb4',
-                'collation' => 'utf8mb4_unicode_ci',
-                'prefix' => '',
-                'strict' => false,
-                'engine' => null,
-            ]]);
-
-            DB::purge('external');
+            $this->configureExternalDatabase();
             $db = DB::connection('external');
 
             $type = \App\Models\Setting::get('external_auth_type', 'XenForo');
@@ -223,5 +181,27 @@ class ExternalAuthService
             Log::error('External Auth Search Error: ' . $e->getMessage());
             return [];
         }
+    }
+
+    /**
+     * Configure the external database connection dynamically.
+     */
+    private function configureExternalDatabase()
+    {
+        config(['database.connections.external' => [
+            'driver' => 'mysql',
+            'host' => \App\Models\Setting::get('external_auth_host', '127.0.0.1'),
+            'port' => \App\Models\Setting::get('external_auth_port', '3306'),
+            'database' => \App\Models\Setting::get('external_auth_database', 'xenforo'),
+            'username' => \App\Models\Setting::get('external_auth_username', 'root'),
+            'password' => \App\Models\Setting::get('external_auth_password', ''),
+            'charset' => 'utf8mb4',
+            'collation' => 'utf8mb4_unicode_ci',
+            'prefix' => '',
+            'strict' => false,
+            'engine' => null,
+        ]]);
+
+        DB::purge('external');
     }
 }
