@@ -5,9 +5,16 @@
 @section('content')
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
         <h2 style="margin: 0;">Manage Users</h2>
-        <button class="btn btn-primary" style="width: auto;" onclick="document.getElementById('addUserModal').style.display='flex'">
-            <i data-feather="plus" style="width: 16px; height: 16px; margin-right: 0.5rem;"></i> Add User
-        </button>
+        <div style="display: flex; gap: 1rem;">
+            @if(\App\Models\Setting::get('external_auth_enabled', false))
+            <button class="btn" style="width: auto; background: rgba(99, 102, 241, 0.1); border: 1px solid var(--primary); color: var(--primary);" onclick="document.getElementById('importUserModal').style.display='flex'">
+                <i data-feather="download" style="width: 16px; height: 16px; margin-right: 0.5rem;"></i> Import External
+            </button>
+            @endif
+            <button class="btn btn-primary" style="width: auto;" onclick="document.getElementById('addUserModal').style.display='flex'">
+                <i data-feather="plus" style="width: 16px; height: 16px; margin-right: 0.5rem;"></i> Add User
+            </button>
+        </div>
     </div>
 
 <div class="table-container">
@@ -55,7 +62,7 @@
                     <td>{{ $user->created_at->format('Y-m-d') }}</td>
                     <td style="text-align: right;">
                         <div style="display: inline-flex; gap: 0.5rem;">
-                            <button type="button" class="btn btn-primary" style="background: rgba(99, 102, 241, 0.1); color: var(--primary); border: 1px solid rgba(99, 102, 241, 0.2); padding: 0.5rem; width: auto;" onclick="openEditModal({{ $user->id }}, '{{ $user->username }}', '{{ $user->email }}', '{{ $user->role }}', {{ $user->status ? 'true' : 'false' }})" title="Edit User">
+                            <button type="button" class="btn btn-primary" style="background: rgba(99, 102, 241, 0.1); color: var(--primary); border: 1px solid rgba(99, 102, 241, 0.2); padding: 0.5rem; width: auto;" onclick="openEditModal({{ $user->id }}, '{{ $user->username }}', '{{ $user->email }}', '{{ $user->role }}', {{ $user->status ? 'true' : 'false' }}, {{ $user->is_external ? 'true' : 'false' }})" title="Edit User">
                                 <i data-feather="edit-2" style="width: 16px; height: 16px;"></i>
                             </button>
                             @if($user->id !== auth()->id())
@@ -130,6 +137,45 @@
     </div>
 </div>
 
+@if(\App\Models\Setting::get('external_auth_enabled', false))
+<div id="importUserModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 100; justify-content: center; align-items: center; backdrop-filter: var(--glass-blur);">
+    <div class="glass-panel" style="max-height: 90vh; overflow-y: auto;">
+        <h3 style="margin-bottom: 0.5rem;">Import External User</h3>
+        <p class="subtitle" style="margin-top: 0; margin-bottom: 1.5rem; font-size: 0.85rem;">Look up a user in your external database (e.g. XenForo) and grant them access to this panel.</p>
+        
+        <form method="POST" action="{{ route('users.import') }}">
+            @csrf
+            
+            <div class="form-group">
+                <label class="form-label">External Username or Email</label>
+                <input type="text" name="external_username" class="form-input" required placeholder="e.g. jdoe">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Panel Role</label>
+                <select name="role" class="form-input" required>
+                    <option value="user">User</option>
+                    <option value="admin">Administrator</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Status</label>
+                <select name="status" class="form-input" required>
+                    <option value="1">Active</option>
+                    <option value="0">Disabled</option>
+                </select>
+            </div>
+
+            <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                <button type="submit" class="btn btn-primary" style="flex: 1;">Import User</button>
+                <button type="button" class="btn" style="flex: 1; border: 1px solid var(--border); color: var(--text-main); background: transparent;" onclick="document.getElementById('importUserModal').style.display='none'">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+@endif
+
 <!-- Edit User Modal -->
 <div id="editUserModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 100; justify-content: center; align-items: center; backdrop-filter: var(--glass-blur);">
     <div class="glass-panel" style="max-height: 90vh; overflow-y: auto;">
@@ -149,9 +195,9 @@
                 <input type="email" name="email" id="edit_email" class="form-input" required>
             </div>
             
-            <div class="form-group">
+            <div class="form-group" id="edit_password_group">
                 <label class="form-label">New Password <small style="color: var(--text-muted);">(Leave blank to keep current)</small></label>
-                <input type="password" name="password" class="form-input" minlength="8">
+                <input type="password" name="password" id="edit_password" class="form-input" minlength="8">
             </div>
 
             <div class="form-group" id="edit_role_group">
@@ -179,13 +225,22 @@
 </div>
 
 <script>
-    function openEditModal(id, username, email, role, status) {
+    function openEditModal(id, username, email, role, status, isExternal) {
         document.getElementById('editUserForm').action = '/users/' + id;
         document.getElementById('edit_username').value = username;
         document.getElementById('edit_email').value = email;
         
         document.getElementById('edit_role').value = role;
         document.getElementById('edit_status').value = status ? '1' : '0';
+        
+        document.getElementById('edit_username').readOnly = isExternal;
+        document.getElementById('edit_email').readOnly = isExternal;
+        
+        if (isExternal) {
+            document.getElementById('edit_password_group').style.display = 'none';
+        } else {
+            document.getElementById('edit_password_group').style.display = 'block';
+        }
         
         if (id == {{ auth()->id() }}) {
             document.getElementById('edit_role_group').style.display = 'none';

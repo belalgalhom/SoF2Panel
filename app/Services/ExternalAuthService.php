@@ -113,4 +113,60 @@ class ExternalAuthService
 
         return null;
     }
+
+    /**
+     * Look up a user in the external database without authenticating.
+     * 
+     * @param string $login Username or Email
+     * @return object|null Returns the external user object if found, null otherwise.
+     */
+    public function lookup($login)
+    {
+        try {
+            $enabled = \App\Models\Setting::get('external_auth_enabled', false);
+            if (!$enabled) {
+                return null;
+            }
+
+            config(['database.connections.external' => [
+                'driver' => 'mysql',
+                'host' => \App\Models\Setting::get('external_auth_host', '127.0.0.1'),
+                'port' => \App\Models\Setting::get('external_auth_port', '3306'),
+                'database' => \App\Models\Setting::get('external_auth_database', 'xenforo'),
+                'username' => \App\Models\Setting::get('external_auth_username', 'root'),
+                'password' => \App\Models\Setting::get('external_auth_password', ''),
+                'charset' => 'utf8mb4',
+                'collation' => 'utf8mb4_unicode_ci',
+                'prefix' => '',
+                'strict' => false,
+                'engine' => null,
+            ]]);
+
+            DB::purge('external');
+            $db = DB::connection('external');
+
+            $type = \App\Models\Setting::get('external_auth_type', 'XenForo');
+            $table = \App\Models\Setting::get('external_auth_table', $type === 'XenForo' ? 'xf_user' : 'users');
+            $colUsername = \App\Models\Setting::get('external_auth_col_username', 'username');
+            $colEmail = \App\Models\Setting::get('external_auth_col_email', 'email');
+
+            $user = $db->table($table)
+                ->where($colUsername, $login)
+                ->orWhere($colEmail, $login)
+                ->first();
+
+            if ($user) {
+                return (object) [
+                    'username' => $user->{$colUsername},
+                    'email' => $user->{$colEmail}
+                ];
+            }
+
+            return null;
+
+        } catch (\Exception $e) {
+            Log::error('External Auth Lookup Error: ' . $e->getMessage());
+            return null;
+        }
+    }
 }

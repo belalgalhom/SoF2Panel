@@ -42,6 +42,45 @@ class UserController extends Controller
         return back()->with('success', 'User created successfully.');
     }
 
+    public function importExternal(Request $request)
+    {
+        $request->validate([
+            'external_username' => 'required|string|max:255',
+            'role' => 'required|in:admin,user',
+            'status' => 'required|in:0,1',
+        ]);
+
+        $externalAuth = app(\App\Services\ExternalAuthService::class);
+        $externalUser = $externalAuth->lookup($request->external_username);
+
+        if (!$externalUser) {
+            return back()->with('error', 'Could not find that user in the external database.');
+        }
+
+        $exists = User::where('email', $externalUser->email)->orWhere('username', $externalUser->username)->first();
+        if ($exists) {
+            return back()->with('error', 'That user already exists in the panel database.');
+        }
+
+        User::create([
+            'username' => $externalUser->username,
+            'email' => $externalUser->email,
+            'password' => Hash::make(\Illuminate\Support\Str::random(32)),
+            'role' => $request->role,
+            'status' => $request->status == '1',
+            'is_external' => true,
+        ]);
+
+        \App\Models\Log::create([
+            'user_id' => auth()->id(),
+            'action' => 'Import External User',
+            'target' => $externalUser->username,
+            'ip' => request()->ip()
+        ]);
+
+        return back()->with('success', "Imported {$externalUser->username} from the external database successfully.");
+    }
+
     public function update(Request $request, User $user)
     {
         $request->validate([

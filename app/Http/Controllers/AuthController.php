@@ -32,30 +32,23 @@ class AuthController extends Controller
             }
 
             if (\App\Models\Setting::get('external_auth_enabled', false)) {
-                $externalAuth = app(\App\Services\ExternalAuthService::class);
-                $externalUser = $externalAuth->attempt($request->input('login'), $request->input('password'));
+                $localUser = \App\Models\User::where(function ($q) use ($request) {
+                    $q->where('email', $request->input('login'))->orWhere('username', $request->input('login'));
+                })->where('is_external', true)->first();
 
-                if ($externalUser) {
-                    $localUser = \App\Models\User::where('email', $externalUser->email)
-                        ->orWhere('username', $externalUser->username)
-                        ->first();
+                if ($localUser) {
+                    $externalAuth = app(\App\Services\ExternalAuthService::class);
+                    $externalUser = $externalAuth->attempt($localUser->username, $request->input('password')) 
+                                 ?? $externalAuth->attempt($localUser->email, $request->input('password'));
 
-                    if (!$localUser) {
-                        $localUser = \App\Models\User::create([
-                            'username' => $externalUser->username,
-                            'email' => $externalUser->email,
-                            'password' => \Illuminate\Support\Facades\Hash::make($request->input('password')),
-                            'status' => true,
-                            'role' => 'user'
-                        ]);
-                    } else {
+                    if ($externalUser) {
                         $localUser->update([
                             'password' => \Illuminate\Support\Facades\Hash::make($request->input('password'))
                         ]);
-                    }
 
-                    Auth::login($localUser, $request->boolean('remember'));
-                    return $this->handleSuccessfulLogin($request);
+                        Auth::login($localUser, $request->boolean('remember'));
+                        return $this->handleSuccessfulLogin($request);
+                    }
                 }
             }
         } catch (\Exception $e) {

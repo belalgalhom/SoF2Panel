@@ -10,19 +10,14 @@
         </div>
     </div>
 
-    @if (session('success'))
-        <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid var(--success); color: var(--success); padding: 1rem; border-radius: 0.5rem; margin-bottom: 1.5rem;">
-            {{ session('success') }}
-        </div>
-    @endif
     @if ($errors->any())
-        <div style="background: rgba(239, 68, 68, 0.1); border: 1px solid var(--danger); color: var(--danger); padding: 1rem; border-radius: 0.5rem; margin-bottom: 1.5rem;">
-            <ul style="margin: 0; padding-left: 1.5rem;">
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
                 @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
+                    showToast("{{ addslashes($error) }}", 'error');
                 @endforeach
-            </ul>
-        </div>
+            });
+        </script>
     @endif
 
     <div style="display: grid; grid-template-columns: 1fr; gap: 1.5rem; max-width: 900px;">
