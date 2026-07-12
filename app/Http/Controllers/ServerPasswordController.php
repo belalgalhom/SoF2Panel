@@ -60,34 +60,52 @@ class ServerPasswordController extends Controller
         $request->validate(['rcon_password' => 'required|string|min:3']);
         $newPassword = $request->rcon_password;
 
-        $server->update([
-            'rcon_password' => Crypt::encryptString($newPassword)
-        ]);
+        $serverService = app(\App\Services\ServerService::class);
+        $status = $serverService->getServerStatus($server);
 
-        try {
-            $serverService = app(\App\Services\ServerService::class);
-            $status = $serverService->getServerStatus($server);
-            
-            if ($status === 'Running') {
-                $ssh = $serverService->getSSH($server->host);
-                $username = escapeshellarg($server->ftp_username);
-                $screenName = str_replace(' ', '_', $server->name);
-                
-                $safeConsolePass = str_replace(['\\', '"', "'"], ['\\\\', '\"', ""], $newPassword);
-                
-                $injectCommand = "screen -S {$screenName} -X stuff 'set rconpassword \"{$safeConsolePass}\"\r'";
-                $ssh->exec("su - {$username} -c " . escapeshellarg($injectCommand));
+        if ($status === 'Running') {
+            try {
+                $oldPassword = Crypt::decryptString($server->rcon_password);
+            } catch (\Throwable $e) {
+                $oldPassword = $server->rcon_password;
             }
-        } catch (\Throwable $e) {
+
+            $host = $server->host->hostname;
+            $port = $server->port;
+
+            $rconController = app(\App\Http\Controllers\WebRconController::class);
+
+            $rconController->sendRconCommand($host, $port, $oldPassword, "set rconpassword \"$newPassword\"");
+
+            usleep(500000);
+
+            $verifyResponse = $rconController->sendRconCommand($host, $port, $newPassword, "rconpassword");
+
+            if (str_contains($verifyResponse, 'Error') || empty(trim($verifyResponse))) {
+                return back()->with('error', 'Failed to verify the new RCON password on the server. Old password is still active.');
+            }
+
+            $server->update(['rcon_password' => Crypt::encryptString($newPassword)]);
+
+            \App\Models\Log::create([
+                'user_id' => $user->id,
+                'action' => 'Changed RCON Password',
+                'target' => $server->name,
+                'ip' => request()->ip()
+            ]);
+
+            return back()->with('success', 'RCON password changed successfully!');
+        } else {
+            $server->update(['rcon_password' => Crypt::encryptString($newPassword)]);
+
+            \App\Models\Log::create([
+                'user_id' => $user->id,
+                'action' => 'Changed RCON Password',
+                'target' => $server->name,
+                'ip' => request()->ip()
+            ]);
+
+            return back()->with('success', 'RCON password changed successfully!');
         }
-
-        \App\Models\Log::create([
-            'user_id' => $user->id,
-            'action' => 'Changed RCON Password',
-            'target' => $server->name,
-            'ip' => request()->ip()
-        ]);
-
-        return back()->with('success', 'RCON Password updated and applied to the server immediately.');
     }
 }
