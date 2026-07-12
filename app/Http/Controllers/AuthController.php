@@ -28,21 +28,35 @@ class AuthController extends Controller
 
         try {
             if (Auth::attempt($credentials, $request->boolean('remember'))) {
-                if (Auth::user()->status === false) {
-                    Auth::logout();
-                    return back()->withErrors(['login' => 'Your account is disabled.'])->onlyInput('login');
+                return $this->handleSuccessfulLogin($request);
+            }
+
+            if (\App\Models\Setting::get('external_auth_enabled', false)) {
+                $externalAuth = app(\App\Services\ExternalAuthService::class);
+                $externalUser = $externalAuth->attempt($request->input('login'), $request->input('password'));
+
+                if ($externalUser) {
+                    $localUser = \App\Models\User::where('email', $externalUser->email)
+                        ->orWhere('username', $externalUser->username)
+                        ->first();
+
+                    if (!$localUser) {
+                        $localUser = \App\Models\User::create([
+                            'username' => $externalUser->username,
+                            'email' => $externalUser->email,
+                            'password' => \Illuminate\Support\Facades\Hash::make($request->input('password')),
+                            'status' => true,
+                            'role' => 'user'
+                        ]);
+                    } else {
+                        $localUser->update([
+                            'password' => \Illuminate\Support\Facades\Hash::make($request->input('password'))
+                        ]);
+                    }
+
+                    Auth::login($localUser, $request->boolean('remember'));
+                    return $this->handleSuccessfulLogin($request);
                 }
-
-                $request->session()->regenerate();
-                
-                \App\Models\Log::create([
-                    'user_id' => Auth::id(),
-                    'action' => 'Login',
-                    'target' => 'System',
-                    'ip' => $request->ip()
-                ]);
-
-                return redirect()->intended('dashboard');
             }
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::error('Login error: ' . $e->getMessage());
@@ -63,6 +77,25 @@ class AuthController extends Controller
         return back()->withErrors([
             'login' => 'The provided credentials do not match our records.',
         ])->onlyInput('login');
+    }
+
+    private function handleSuccessfulLogin(Request $request)
+    {
+        if (Auth::user()->status === false) {
+            Auth::logout();
+            return back()->withErrors(['login' => 'Your account is disabled.'])->onlyInput('login');
+        }
+
+        $request->session()->regenerate();
+        
+        \App\Models\Log::create([
+            'user_id' => Auth::id(),
+            'action' => 'Login',
+            'target' => 'System',
+            'ip' => $request->ip()
+        ]);
+
+        return redirect()->intended('dashboard');
     }
 
     public function logout(Request $request)

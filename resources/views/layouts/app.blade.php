@@ -48,6 +48,9 @@
                 <a href="{{ route('logs.index') }}" class="nav-item {{ request()->routeIs('logs.*') ? 'active' : '' }}">
                     <i data-feather="activity"></i> Logs
                 </a>
+                <a href="{{ route('admin.settings.index') }}" class="nav-item {{ request()->routeIs('admin.settings.*') ? 'active' : '' }}">
+                    <i data-feather="settings"></i> Settings
+                </a>
                 @endif
             </nav>
 

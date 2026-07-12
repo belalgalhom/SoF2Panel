@@ -80,5 +80,9 @@ Route::middleware('auth')->group(function () {
         Route::resource('games', \App\Http\Controllers\GameController::class)->except(['show']);
         Route::resource('users', \App\Http\Controllers\UserController::class)->except(['show', 'edit', 'create']);
         Route::get('logs', [\App\Http\Controllers\LogController::class, 'index'])->name('logs.index');
+        
+        // Settings
+        Route::get('settings', [\App\Http\Controllers\Admin\SettingController::class, 'index'])->name('admin.settings.index');
+        Route::post('settings/external-auth', [\App\Http\Controllers\Admin\SettingController::class, 'updateExternalAuth'])->name('admin.settings.external-auth');
     });
 });

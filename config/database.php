@@ -64,6 +64,22 @@ return [
             ]) : [],
         ],
 
+        'external' => [
+            'driver' => 'mysql',
+            'host' => env('EXTERNAL_AUTH_DB_HOST', '127.0.0.1'),
+            'port' => env('EXTERNAL_AUTH_DB_PORT', '3306'),
+            'database' => env('EXTERNAL_AUTH_DB_DATABASE', 'xenforo'),
+            'username' => env('EXTERNAL_AUTH_DB_USERNAME', 'root'),
+            'password' => env('EXTERNAL_AUTH_DB_PASSWORD', ''),
+            'unix_socket' => env('DB_SOCKET', ''),
+            'charset' => 'utf8mb4',
+            'collation' => 'utf8mb4_unicode_ci',
+            'prefix' => '',
+            'prefix_indexes' => true,
+            'strict' => false,
+            'engine' => null,
+        ],
+
         'mariadb' => [
             'driver' => 'mariadb',
             'url' => env('DB_URL'),
