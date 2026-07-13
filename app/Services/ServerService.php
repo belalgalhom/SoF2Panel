@@ -151,6 +151,22 @@ class ServerService
             'size' => $sizeMb * 1024 * 1024,
         ]);
         
+        $backupLimit = \App\Models\Setting::get('backup_limit', 5);
+        $totalBackups = $server->backups()->count();
+        
+        if ($totalBackups > $backupLimit) {
+            $toDelete = $totalBackups - $backupLimit;
+            $oldestBackups = $server->backups()->orderBy('created_at', 'asc')->limit($toDelete)->get();
+            
+            foreach ($oldestBackups as $oldBackup) {
+                try {
+                    $this->deleteBackup($server, $oldBackup);
+                } catch (\Exception $e) {
+                    \Illuminate\Support\Facades\Log::error("Failed to prune old backup {$oldBackup->filename}: " . $e->getMessage());
+                }
+            }
+        }
+        
         return true;
     }
 

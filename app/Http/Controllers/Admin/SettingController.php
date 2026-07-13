@@ -27,6 +27,7 @@ class SettingController extends Controller
 
         $general = [
             'app_name' => Setting::get('app_name', env('APP_NAME', 'SOF2Panel')),
+            'backup_limit' => Setting::get('backup_limit', 5),
         ];
 
         return view('admin.settings.index', compact('externalAuth', 'general'));
@@ -36,9 +37,11 @@ class SettingController extends Controller
     {
         $request->validate([
             'app_name' => 'required|string|max:255',
+            'backup_limit' => 'required|integer|min:1|max:50',
         ]);
 
         Setting::set('app_name', $request->app_name);
+        Setting::set('backup_limit', $request->backup_limit);
 
         \App\Models\Log::create([
             'user_id' => auth()->id(),

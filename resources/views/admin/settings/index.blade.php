@@ -30,9 +30,15 @@
             <form action="{{ route('admin.settings.general') }}" method="POST">
                 @csrf
                 
-                <div class="form-group">
-                    <label class="form-label">Panel Name</label>
-                    <input type="text" class="form-input" name="app_name" value="{{ $general['app_name'] }}" required>
+                <div style="display: flex; gap: 2rem;" class="flex-responsive">
+                    <div class="form-group" style="flex: 2;">
+                        <label class="form-label">Panel Name</label>
+                        <input type="text" class="form-input" name="app_name" value="{{ $general['app_name'] }}" required>
+                    </div>
+                    <div class="form-group" style="flex: 1;">
+                        <label class="form-label">Max Backups (Per Server)</label>
+                        <input type="number" class="form-input" name="backup_limit" value="{{ $general['backup_limit'] }}" min="1" max="50" required>
+                    </div>
                 </div>
 
                 <div style="display: flex; gap: 1rem; margin-top: 2rem;">
@@ -44,7 +50,7 @@
         <div class="glass-panel" style="width: 100%; max-width: none;">
             <h3 style="margin-bottom: 0.5rem;">External Authentication</h3>
             <p class="subtitle" style="margin-top: 0; margin-bottom: 1.5rem; font-size: 0.9rem;">
-                Configure a bridge to authenticate users against an external database like XenForo or a custom website. Users will be automatically imported into this panel on successful login.
+                Configure a bridge to authenticate users against an external database like XenForo or a custom website
             </p>
 
             <form action="{{ route('admin.settings.external-auth') }}" method="POST">
