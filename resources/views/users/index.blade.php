@@ -148,7 +148,7 @@
             
             <div class="form-group" style="position: relative;">
                 <label class="form-label">External Username or Email</label>
-                <input type="text" name="external_username" id="external_username_input" class="form-input" required placeholder="e.g. jdoe" autocomplete="off">
+                <input type="text" name="external_username" id="external_username_input" class="form-input" required autocomplete="off">
                 <div id="external_username_results" style="display: none; position: absolute; top: 100%; left: 0; right: 0; background: var(--bg-card); border: 1px solid var(--border); border-radius: 0.5rem; max-height: 200px; overflow-y: auto; z-index: 1000; margin-top: 0.25rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1);"></div>
             </div>
 
