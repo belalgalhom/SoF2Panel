@@ -17,7 +17,7 @@
 
 <div class="table-container">
     <div class="table-responsive">
-        <table class="table">
+        <table class="panel-table">
             <thead>
                 <tr>
                     <th style="width: 50px;">ID</th>
