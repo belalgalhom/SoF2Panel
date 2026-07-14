@@ -19,6 +19,7 @@ SOF2Panel is a premium, web-based management dashboard designed to seamlessly pr
 
 - **External Authentication**: Securely bridge your panel with external databases (like XenForo) to allow users to log in using their forum credentials. Features a strict Admin-only "Import User" workflow with live autocomplete search to keep your panel completely locked down.
 - **Powerful REST API**: Admins can generate secure API keys to integrate their servers with Discord bots or external billing systems. The API supports fetching server data, starting/stopping/restarting servers, and sending RCON commands directly via HTTP requests—all completely logged and audited.
+- **Integrated Support Tickets**: A modern, real-time chat interface for users to submit issues directly to administrators. Features dynamic status management (Open, Solved, Closed), optional closing reasons, and categorized support flows.
 
 ---
 
