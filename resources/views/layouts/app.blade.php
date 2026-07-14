@@ -32,6 +32,10 @@
                     <i data-feather="server"></i> Servers
                 </a>
 
+                <a href="{{ route('tickets.index') }}" class="nav-item {{ request()->routeIs('tickets.*') ? 'active' : '' }}">
+                    <i data-feather="life-buoy"></i> Support
+                </a>
+
                 @if(auth()->user()->isAdmin())
                 <a href="{{ route('hosts.index') }}" class="nav-item {{ request()->routeIs('hosts.*') ? 'active' : '' }}">
                     <i data-feather="hard-drive"></i> Hosts
