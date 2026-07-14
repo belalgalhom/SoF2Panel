@@ -71,11 +71,8 @@
                     </form>
                     <script>
                         function closeTicketWithReason() {
-                            const reason = prompt("Optional: Provide a reason for closing this ticket, or leave blank to just close it.");
-                            if (reason !== null) {
-                                document.getElementById('closeTicketReason').value = reason;
-                                document.getElementById('closeTicketForm').submit();
-                            }
+                            document.getElementById('closeTicketModal').style.display = 'flex';
+                            document.getElementById('modalReasonInput').focus();
                         }
                     </script>
                     @endif
@@ -168,6 +165,30 @@
             });
         }
     });
+</script>
+
+<div id="closeTicketModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); z-index: 9999; align-items: center; justify-content: center;">
+    <div style="background: var(--bg-modifier-hover); border: 1px solid var(--border); border-radius: 12px; padding: 2rem; width: 100%; max-width: 450px; box-shadow: 0 20px 40px rgba(0,0,0,0.5);">
+        <h3 style="margin-top: 0; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; color: #fff;">
+            <i data-feather="lock" style="width: 20px; height: 20px; color: var(--danger);"></i> Close Ticket
+        </h3>
+        <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.5rem;">
+            Are you sure you want to close this ticket? You can optionally provide a reason below.
+        </p>
+        <textarea id="modalReasonInput" class="form-input" rows="3" placeholder="Optional reason for closing..." style="width: 100%; margin-bottom: 1.5rem; border-radius: 8px; resize: none;"></textarea>
+        <div style="display: flex; justify-content: flex-end; gap: 1rem;">
+            <button type="button" class="btn" style="background: rgba(255,255,255,0.1); border: none;" onclick="document.getElementById('closeTicketModal').style.display='none'">Cancel</button>
+            <button type="button" class="btn" style="background: var(--danger); border: none; color: #fff;" onclick="submitCloseTicketModal()">Close Ticket</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    function submitCloseTicketModal() {
+        const reason = document.getElementById('modalReasonInput').value;
+        document.getElementById('closeTicketReason').value = reason;
+        document.getElementById('closeTicketForm').submit();
+    }
 </script>
 
 @endsection
