@@ -3,7 +3,7 @@
 @section('title', 'Support Tickets')
 
 @section('content')
-<div class="content-header" style="display: flex; justify-content: space-between; align-items: center;">
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
     <div>
         <h1 class="page-title">Support Tickets</h1>
         <p class="subtitle">Manage and reply to support inquiries.</p>
@@ -15,7 +15,7 @@
     @endif
 </div>
 
-<div class="glass-panel" style="padding: 0;">
+<div class="table-container">
     <div class="table-responsive">
         <table class="table">
             <thead>

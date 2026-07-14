@@ -3,7 +3,7 @@
 @section('title', 'Ticket #' . $ticket->id)
 
 @section('content')
-<div class="content-header" style="display: flex; justify-content: space-between; align-items: flex-start;">
+<div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2rem;">
     <div>
         <a href="{{ route('tickets.index') }}" style="color: var(--text-muted); text-decoration: none; margin-bottom: 0.5rem; display: inline-block;">
             &larr; Back to Tickets

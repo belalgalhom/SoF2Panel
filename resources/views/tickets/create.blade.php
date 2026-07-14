@@ -3,7 +3,7 @@
 @section('title', 'Create Ticket')
 
 @section('content')
-<div class="content-header">
+<div style="margin-bottom: 2rem;">
     <a href="{{ route('tickets.index') }}" style="color: var(--text-muted); text-decoration: none; margin-bottom: 0.5rem; display: inline-block;">
         &larr; Back to Tickets
     </a>
