@@ -82,7 +82,7 @@
                         <td style="color: var(--text-muted);">{{ $ticket->created_at->diffForHumans() }}</td>
                         
                         <td style="text-align: right;">
-                            <a href="{{ route('tickets.show', $ticket) }}" class="btn btn-secondary" style="padding: 0.5rem 1rem;">
+                            <a href="{{ route('tickets.show', $ticket) }}" class="btn" style="width: auto; padding: 0.4rem 1rem; background: rgba(99,102,241,0.1); border: 1px solid var(--primary); color: var(--primary); font-size: 0.85rem;">
                                 View
                             </a>
                         </td>
