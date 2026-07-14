@@ -8,11 +8,9 @@
         <h1 class="page-title">Support Tickets</h1>
         <p class="subtitle">Manage and reply to support inquiries.</p>
     </div>
-    @if(!auth()->user()->isAdmin())
     <a href="{{ route('tickets.create') }}" class="btn btn-primary" style="width: auto;">
         <i data-feather="plus" style="width: 16px; height: 16px; margin-right: 0.5rem;"></i> Create Ticket
     </a>
-    @endif
 </div>
 
 <div class="table-container">
