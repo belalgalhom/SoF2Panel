@@ -177,8 +177,8 @@
         </p>
         <textarea id="modalReasonInput" class="form-input" rows="3" placeholder="Optional reason for closing..." style="width: 100%; margin-bottom: 1.5rem; border-radius: 8px; resize: none;"></textarea>
         <div style="display: flex; justify-content: flex-end; gap: 1rem;">
-            <button type="button" class="btn" style="background: rgba(255,255,255,0.1); border: none;" onclick="document.getElementById('closeTicketModal').style.display='none'">Cancel</button>
-            <button type="button" class="btn" style="background: var(--danger); border: none; color: #fff;" onclick="submitCloseTicketModal()">Close Ticket</button>
+            <button type="button" class="btn" onclick="document.getElementById('closeTicketModal').style.display='none'" style="width: auto;">Cancel</button>
+            <button type="button" class="btn" style="width: auto; background: var(--danger); border: none; color: #fff;" onclick="submitCloseTicketModal()">Close Ticket</button>
         </div>
     </div>
 </div>
