@@ -21,7 +21,11 @@ class TicketController extends Controller
 
     public function create()
     {
-        $servers = auth()->user()->servers;
+        if (auth()->user()->isAdmin()) {
+            $servers = \App\Models\Server::all();
+        } else {
+            $servers = auth()->user()->servers;
+        }
         return view('tickets.create', compact('servers'));
     }
 
