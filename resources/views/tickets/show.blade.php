@@ -167,8 +167,8 @@
     });
 </script>
 
-<div id="closeTicketModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); z-index: 9999; align-items: center; justify-content: center;">
-    <div style="background: var(--bg-modifier-hover); border: 1px solid var(--border); border-radius: 12px; padding: 2rem; width: 100%; max-width: 450px; box-shadow: 0 20px 40px rgba(0,0,0,0.5);">
+<div id="closeTicketModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 100; justify-content: center; align-items: center; backdrop-filter: var(--glass-blur);">
+    <div class="glass-panel" style="width: 100%; max-width: 450px; padding: 2rem; box-shadow: 0 20px 40px rgba(0,0,0,0.5);">
         <h3 style="margin-top: 0; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; color: #fff;">
             <i data-feather="lock" style="width: 20px; height: 20px; color: var(--danger);"></i> Close Ticket
         </h3>
