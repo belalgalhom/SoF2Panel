@@ -47,20 +47,37 @@
                 @if(auth()->user()->isAdmin())
                     <form action="{{ route('tickets.status', $ticket) }}" method="POST" style="margin: 0; display: flex; align-items: center;">
                         @csrf
-                        <select name="status" class="form-input" style="padding: 0.4rem 2rem 0.4rem 1rem; width: auto; font-size: 0.85rem; background-color: rgba(0,0,0,0.3);" onchange="this.form.submit()">
+                        <select name="status" class="form-input" style="padding: 0.4rem 2rem 0.4rem 1rem; width: auto; font-size: 0.85rem; background-color: rgba(0,0,0,0.3); border-right: none; border-radius: 8px 0 0 8px;" onchange="this.form.submit()">
                             <option value="Open" {{ $ticket->status === 'Open' ? 'selected' : '' }}>Status: Open</option>
                             <option value="Solved" {{ $ticket->status === 'Solved' ? 'selected' : '' }}>Status: Solved</option>
                             <option value="Closed" {{ $ticket->status === 'Closed' ? 'selected' : '' }}>Status: Closed</option>
                         </select>
                     </form>
-                @else
-                    @if($ticket->status !== 'Closed')
-                    <form action="{{ route('tickets.close', $ticket) }}" method="POST" style="margin: 0;">
+                    <form action="{{ route('tickets.destroy', $ticket) }}" method="POST" style="margin: 0; display: flex; align-items: center;" onsubmit="return confirm('Are you sure you want to permanently delete this ticket?')">
                         @csrf
-                        <button type="submit" class="btn" style="width: auto; background: rgba(239, 68, 68, 0.1); border: 1px solid var(--danger); color: var(--danger); padding: 0.5rem 1rem; font-size: 0.9rem; border-radius: 8px; transition: all 0.2s;" onmouseover="this.style.background='var(--danger)'; this.style.color='#fff'" onmouseout="this.style.background='rgba(239, 68, 68, 0.1)'; this.style.color='var(--danger)'">
+                        @method('DELETE')
+                        <button type="submit" class="btn" style="width: auto; padding: 0.4rem 0.75rem; font-size: 0.85rem; background-color: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); color: var(--danger); border-radius: 0 8px 8px 0; border-left: none; transition: all 0.2s;" onmouseover="this.style.background='var(--danger)'; this.style.color='#fff'" onmouseout="this.style.background='rgba(239, 68, 68, 0.1)'; this.style.color='var(--danger)'" title="Delete Ticket">
+                            <i data-feather="trash-2" style="width: 16px; height: 16px;"></i>
+                        </button>
+                    </form>
+                @else
+                    @if(!in_array($ticket->status, ['Closed', 'Solved']))
+                    <form action="{{ route('tickets.close', $ticket) }}" method="POST" style="margin: 0;" id="closeTicketForm">
+                        @csrf
+                        <input type="hidden" name="reason" id="closeTicketReason">
+                        <button type="button" onclick="closeTicketWithReason()" class="btn" style="width: auto; background: rgba(239, 68, 68, 0.1); border: 1px solid var(--danger); color: var(--danger); padding: 0.5rem 1rem; font-size: 0.9rem; border-radius: 8px; transition: all 0.2s;" onmouseover="this.style.background='var(--danger)'; this.style.color='#fff'" onmouseout="this.style.background='rgba(239, 68, 68, 0.1)'; this.style.color='var(--danger)'">
                             <i data-feather="lock" style="width: 14px; height: 14px; margin-right: 0.4rem;"></i> Close Ticket
                         </button>
                     </form>
+                    <script>
+                        function closeTicketWithReason() {
+                            const reason = prompt("Optional: Provide a reason for closing this ticket, or leave blank to just close it.");
+                            if (reason !== null) {
+                                document.getElementById('closeTicketReason').value = reason;
+                                document.getElementById('closeTicketForm').submit();
+                            }
+                        }
+                    </script>
                     @endif
                 @endif
             </div>
@@ -106,16 +123,16 @@
         </div>
 
         {{-- Reply Box Area --}}
-        @if($ticket->status !== 'Closed')
+        @if(!in_array($ticket->status, ['Closed', 'Solved']))
         <div style="padding: 1.5rem; border-top: 1px solid var(--border); background: rgba(0,0,0,0.2);">
             <form action="{{ route('tickets.reply', $ticket) }}" method="POST">
                 @csrf
-                <div style="position: relative;">
-                    <textarea name="message" class="form-input" rows="3" placeholder="Type your reply..." required style="resize: none; padding-right: 120px; border-radius: 12px; background: rgba(15, 17, 26, 0.7);"></textarea>
+                <div style="display: flex; gap: 1rem; align-items: flex-end;">
+                    <textarea name="message" id="chatInput" class="form-input" rows="1" placeholder="Type your reply... (Press Enter to send)" required style="resize: none; border-radius: 12px; background: rgba(15, 17, 26, 0.7); overflow-y: hidden; padding-top: 0.8rem; padding-bottom: 0.8rem; height: 46px; transition: height 0.1s;" oninput="this.style.height = '46px'; this.style.height = Math.min(this.scrollHeight, 150) + 'px'"></textarea>
                     
-                    <button type="submit" class="btn btn-primary" style="position: absolute; right: 0.75rem; bottom: 0.75rem; width: auto; padding: 0.5rem 1.25rem; border-radius: 8px;">
-                        <span style="display: flex; align-items: center; font-size: 0.9rem;">
-                            Send <i data-feather="send" style="width: 14px; height: 14px; margin-left: 0.5rem;"></i>
+                    <button type="submit" class="btn btn-primary" style="width: auto; padding: 0 1.5rem; border-radius: 8px; flex-shrink: 0; height: 46px; display: flex; align-items: center; justify-content: center;">
+                        <span style="display: flex; align-items: center; font-size: 0.95rem;">
+                            Send <i data-feather="send" style="width: 15px; height: 15px; margin-left: 0.5rem;"></i>
                         </span>
                     </button>
                 </div>
@@ -124,7 +141,7 @@
         @else
         <div style="padding: 1.5rem; border-top: 1px solid var(--border); background: rgba(0,0,0,0.2); text-align: center; color: var(--text-muted);">
             <i data-feather="lock" style="width: 16px; height: 16px; margin-bottom: 0.5rem; opacity: 0.5;"></i>
-            <p style="margin: 0; font-size: 0.9rem;">This ticket is closed and cannot receive new replies.</p>
+            <p style="margin: 0; font-size: 0.9rem;">This ticket is marked as {{ strtolower($ticket->status) }} and cannot receive new replies.</p>
         </div>
         @endif
         
@@ -137,6 +154,18 @@
         const chatContainer = document.getElementById('chatContainer');
         if (chatContainer) {
             chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        const chatInput = document.getElementById('chatInput');
+        if (chatInput) {
+            chatInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    if (this.value.trim() !== '') {
+                        this.closest('form').submit();
+                    }
+                }
+            });
         }
     });
 </script>

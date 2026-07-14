@@ -103,14 +103,36 @@ class TicketController extends Controller
         return back()->with('success', 'Ticket status updated.');
     }
 
-    public function close(Ticket $ticket)
+    public function close(Request $request, Ticket $ticket)
     {
         if (!auth()->user()->isAdmin() && $ticket->user_id !== auth()->id()) {
             abort(403);
         }
 
+        $request->validate([
+            'reason' => 'nullable|string|max:500'
+        ]);
+
         $ticket->update(['status' => 'Closed']);
 
+        if ($request->filled('reason')) {
+            $ticket->messages()->create([
+                'user_id' => auth()->id(),
+                'message' => "Ticket closed. Reason: " . $request->reason,
+            ]);
+        }
+
         return back()->with('success', 'Ticket closed successfully.');
+    }
+
+    public function destroy(Ticket $ticket)
+    {
+        if (!auth()->user()->isAdmin()) {
+            abort(403);
+        }
+
+        $ticket->delete();
+
+        return redirect()->route('tickets.index')->with('success', 'Ticket deleted successfully.');
     }
 }
