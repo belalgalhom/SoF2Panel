@@ -72,8 +72,8 @@
                         <td>
                             @if($ticket->status === 'Open')
                                 <span class="badge" style="background: rgba(16, 185, 129, 0.15); color: #34d399;">Open</span>
-                            @elseif($ticket->status === 'Answered')
-                                <span class="badge" style="background: rgba(59, 130, 246, 0.15); color: #60a5fa;">Answered</span>
+                            @elseif($ticket->status === 'Solved')
+                                <span class="badge" style="background: rgba(59, 130, 246, 0.15); color: #60a5fa;">Solved</span>
                             @else
                                 <span class="badge" style="background: rgba(239, 68, 68, 0.15); color: #f87171;">Closed</span>
                             @endif

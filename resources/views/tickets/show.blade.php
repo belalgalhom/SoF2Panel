@@ -19,8 +19,8 @@
                     {{ $ticket->subject }}
                     @if($ticket->status === 'Open')
                         <span class="badge" style="background: rgba(16, 185, 129, 0.15); color: #34d399; font-size: 0.75rem; border: 1px solid rgba(16, 185, 129, 0.3);">OPEN</span>
-                    @elseif($ticket->status === 'Answered')
-                        <span class="badge" style="background: rgba(59, 130, 246, 0.15); color: #60a5fa; font-size: 0.75rem; border: 1px solid rgba(59, 130, 246, 0.3);">ANSWERED</span>
+                    @elseif($ticket->status === 'Solved')
+                        <span class="badge" style="background: rgba(59, 130, 246, 0.15); color: #60a5fa; font-size: 0.75rem; border: 1px solid rgba(59, 130, 246, 0.3);">SOLVED</span>
                     @else
                         <span class="badge" style="background: rgba(239, 68, 68, 0.15); color: #f87171; font-size: 0.75rem; border: 1px solid rgba(239, 68, 68, 0.3);">CLOSED</span>
                     @endif
@@ -44,13 +44,24 @@
             </div>
             
             <div style="display: flex; align-items: center; gap: 1rem;">
-                @if($ticket->status !== 'Closed')
-                <form action="{{ route('tickets.close', $ticket) }}" method="POST" style="margin: 0;">
-                    @csrf
-                    <button type="submit" class="btn" style="width: auto; background: rgba(239, 68, 68, 0.1); border: 1px solid var(--danger); color: var(--danger); padding: 0.5rem 1rem; font-size: 0.9rem; border-radius: 8px; transition: all 0.2s;" onmouseover="this.style.background='var(--danger)'; this.style.color='#fff'" onmouseout="this.style.background='rgba(239, 68, 68, 0.1)'; this.style.color='var(--danger)'">
-                        <i data-feather="lock" style="width: 14px; height: 14px; margin-right: 0.4rem;"></i> Close Ticket
-                    </button>
-                </form>
+                @if(auth()->user()->isAdmin())
+                    <form action="{{ route('tickets.status', $ticket) }}" method="POST" style="margin: 0; display: flex; align-items: center;">
+                        @csrf
+                        <select name="status" class="form-input" style="padding: 0.4rem 2rem 0.4rem 1rem; width: auto; font-size: 0.85rem; background-color: rgba(0,0,0,0.3);" onchange="this.form.submit()">
+                            <option value="Open" {{ $ticket->status === 'Open' ? 'selected' : '' }}>Status: Open</option>
+                            <option value="Solved" {{ $ticket->status === 'Solved' ? 'selected' : '' }}>Status: Solved</option>
+                            <option value="Closed" {{ $ticket->status === 'Closed' ? 'selected' : '' }}>Status: Closed</option>
+                        </select>
+                    </form>
+                @else
+                    @if($ticket->status !== 'Closed')
+                    <form action="{{ route('tickets.close', $ticket) }}" method="POST" style="margin: 0;">
+                        @csrf
+                        <button type="submit" class="btn" style="width: auto; background: rgba(239, 68, 68, 0.1); border: 1px solid var(--danger); color: var(--danger); padding: 0.5rem 1rem; font-size: 0.9rem; border-radius: 8px; transition: all 0.2s;" onmouseover="this.style.background='var(--danger)'; this.style.color='#fff'" onmouseout="this.style.background='rgba(239, 68, 68, 0.1)'; this.style.color='var(--danger)'">
+                            <i data-feather="lock" style="width: 14px; height: 14px; margin-right: 0.4rem;"></i> Close Ticket
+                        </button>
+                    </form>
+                    @endif
                 @endif
             </div>
         </div>

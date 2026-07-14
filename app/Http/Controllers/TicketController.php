@@ -81,13 +81,26 @@ class TicketController extends Controller
             'message' => $request->message,
         ]);
 
-        if (auth()->user()->isAdmin()) {
-            $ticket->update(['status' => 'Answered']);
-        } else {
+        if (!auth()->user()->isAdmin()) {
             $ticket->update(['status' => 'Open']);
         }
 
         return back()->with('success', 'Reply sent successfully.');
+    }
+
+    public function updateStatus(Request $request, Ticket $ticket)
+    {
+        if (!auth()->user()->isAdmin()) {
+            abort(403);
+        }
+
+        $request->validate([
+            'status' => 'required|in:Open,Solved,Closed'
+        ]);
+
+        $ticket->update(['status' => $request->status]);
+
+        return back()->with('success', 'Ticket status updated.');
     }
 
     public function close(Ticket $ticket)
