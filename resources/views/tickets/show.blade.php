@@ -4,7 +4,7 @@
 
 @section('content')
 
-<div style="max-width: 1000px; margin: 0 auto;">
+<div style="width: 100%;">
     
     <a href="{{ route('tickets.index') }}" style="color: var(--text-muted); text-decoration: none; font-size: 0.875rem; display: inline-flex; align-items: center; margin-bottom: 1rem; transition: color 0.2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='var(--text-muted)'">
         <i data-feather="arrow-left" style="width: 16px; height: 16px; margin-right: 0.5rem;"></i> Back to Tickets
