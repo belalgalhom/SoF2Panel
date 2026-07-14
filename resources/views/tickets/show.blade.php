@@ -128,7 +128,7 @@
             <form action="{{ route('tickets.reply', $ticket) }}" method="POST">
                 @csrf
                 <div style="display: flex; gap: 1rem; align-items: flex-end;">
-                    <textarea name="message" id="chatInput" class="form-input" rows="1" placeholder="Type your reply... (Press Enter to send)" required style="resize: none; border-radius: 12px; background: rgba(15, 17, 26, 0.7); overflow-y: hidden; padding-top: 0.8rem; padding-bottom: 0.8rem; height: 46px; transition: height 0.1s;" oninput="this.style.height = '46px'; this.style.height = Math.min(this.scrollHeight, 150) + 'px'"></textarea>
+                    <textarea name="message" id="chatInput" class="form-input" rows="1" placeholder="Type your reply..." required style="resize: none; border-radius: 12px; background: rgba(15, 17, 26, 0.7); overflow-y: hidden; padding-top: 0.8rem; padding-bottom: 0.8rem; height: 46px; transition: height 0.1s;" oninput="this.style.height = '46px'; this.style.height = Math.min(this.scrollHeight, 150) + 'px'"></textarea>
                     
                     <button type="submit" class="btn btn-primary" style="width: auto; padding: 0 1.5rem; border-radius: 8px; flex-shrink: 0; height: 46px; display: flex; align-items: center; justify-content: center;">
                         <span style="display: flex; align-items: center; font-size: 0.95rem;">
