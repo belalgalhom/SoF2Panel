@@ -3,12 +3,16 @@
 @section('title', 'Create Ticket')
 
 @section('content')
-<div style="margin-bottom: 2rem;">
-    <a href="{{ route('tickets.index') }}" style="color: var(--text-muted); text-decoration: none; margin-bottom: 0.5rem; display: inline-block;">
-        &larr; Back to Tickets
-    </a>
-    <h1 class="page-title">New Support Ticket</h1>
-    <p class="subtitle">Tell us what's wrong so we can help you fix it.</p>
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+    <div>
+        <h1 class="page-title" style="margin-bottom: 0;">New Support Ticket</h1>
+        <p class="subtitle" style="margin-top: 0.25rem;">Tell us what's wrong so we can help you fix it.</p>
+    </div>
+    <div style="display: flex; gap: 0.5rem;">
+        <a href="{{ route('tickets.index') }}" class="btn" style="border: 1px solid var(--border); color: var(--text-main); background: var(--input-bg); width: auto;">
+            Back to Tickets
+        </a>
+    </div>
 </div>
 
 <div class="glass-panel">

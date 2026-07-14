@@ -3,33 +3,36 @@
 @section('title', 'Ticket #' . $ticket->id)
 
 @section('content')
-<div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2rem;">
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
     <div>
-        <a href="{{ route('tickets.index') }}" style="color: var(--text-muted); text-decoration: none; margin-bottom: 0.5rem; display: inline-block;">
-            &larr; Back to Tickets
-        </a>
-        <h1 class="page-title" style="margin-bottom: 0.25rem;">{{ $ticket->subject }}</h1>
-        <div style="display: flex; gap: 1rem; color: var(--text-muted); font-size: 0.9rem;">
+        <h1 class="page-title" style="margin-bottom: 0;">{{ $ticket->subject }}</h1>
+        <div style="display: flex; gap: 1rem; color: var(--text-muted); font-size: 0.9rem; margin-top: 0.25rem;">
             <span>Category: {{ $ticket->category }}</span>
             <span>&bull;</span>
             <span>Server: {{ $ticket->server ? $ticket->server->name : 'None' }}</span>
         </div>
     </div>
-    <div style="text-align: right;">
-        @if($ticket->status === 'Open')
-            <span class="badge" style="background: rgba(16, 185, 129, 0.15); color: #34d399; font-size: 0.9rem; padding: 0.5rem 1rem;">Open</span>
-        @elseif($ticket->status === 'Answered')
-            <span class="badge" style="background: rgba(59, 130, 246, 0.15); color: #60a5fa; font-size: 0.9rem; padding: 0.5rem 1rem;">Answered</span>
-        @else
-            <span class="badge" style="background: rgba(239, 68, 68, 0.15); color: #f87171; font-size: 0.9rem; padding: 0.5rem 1rem;">Closed</span>
-        @endif
+    <div style="display: flex; align-items: center; gap: 1rem;">
+        <div>
+            @if($ticket->status === 'Open')
+                <span class="badge" style="background: rgba(16, 185, 129, 0.15); color: #34d399; font-size: 0.9rem; padding: 0.5rem 1rem;">Open</span>
+            @elseif($ticket->status === 'Answered')
+                <span class="badge" style="background: rgba(59, 130, 246, 0.15); color: #60a5fa; font-size: 0.9rem; padding: 0.5rem 1rem;">Answered</span>
+            @else
+                <span class="badge" style="background: rgba(239, 68, 68, 0.15); color: #f87171; font-size: 0.9rem; padding: 0.5rem 1rem;">Closed</span>
+            @endif
+        </div>
         
         @if($ticket->status !== 'Closed')
-        <form action="{{ route('tickets.close', $ticket) }}" method="POST" style="margin-top: 0.5rem;">
+        <form action="{{ route('tickets.close', $ticket) }}" method="POST" style="margin: 0;">
             @csrf
-            <button class="btn btn-danger" style="padding: 0.25rem 0.75rem; font-size: 0.8rem;">Close Ticket</button>
+            <button class="btn btn-danger" style="padding: 0.5rem 1rem; width: auto;">Close Ticket</button>
         </form>
         @endif
+        
+        <a href="{{ route('tickets.index') }}" class="btn" style="border: 1px solid var(--border); color: var(--text-main); background: var(--input-bg); width: auto; padding: 0.5rem 1rem;">
+            Back to Tickets
+        </a>
     </div>
 </div>
 
