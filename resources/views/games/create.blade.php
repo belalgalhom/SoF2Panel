@@ -23,7 +23,7 @@
 
             <div class="form-group">
                 <label class="form-label">Start Script</label>
-                <textarea name="start_script" class="form-input" style="min-height: 150px; font-family: monospace;" required>{{ old('start_script', '~/sof2ded +set dedicated 2 +set net_port {server_port} +set fs_homepath /home/{server_account} +set sv_maxclients {max_clients} +exec Config.cfg +set rconpassword {rconpassword}') }}</textarea>
+                <textarea name="start_script" class="form-input" style="min-height: 150px; font-family: monospace;" required>{{ old('start_script') }}</textarea>
                 <small style="color: var(--text-muted); margin-top: 0.5rem; display: block;">Available variables: {server_port}, {server_port_gold}, {max_clients}, {rconpassword}, {server_account}, {server_name}</small>
             </div>
 
