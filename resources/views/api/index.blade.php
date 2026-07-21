@@ -76,6 +76,9 @@ function copyToken() {
                     <thead>
                         <tr>
                             <th>Name</th>
+                            @if(auth()->user()->isAdmin())
+                            <th>User</th>
+                            @endif
                             <th>Created</th>
                             <th>Last Used</th>
                             <th style="text-align: right;">Actions</th>
@@ -85,6 +88,15 @@ function copyToken() {
                         @foreach($keys as $key)
                         <tr>
                             <td><strong>{{ $key->name }}</strong></td>
+                            @if(auth()->user()->isAdmin())
+                            <td>
+                                @if($key->user)
+                                    <span>{{ $key->user->username }}</span>
+                                @else
+                                    <span style="color: var(--text-muted);">Unknown</span>
+                                @endif
+                            </td>
+                            @endif
                             <td style="color: var(--text-muted);">{{ $key->created_at->diffForHumans() }}</td>
                             <td style="color: var(--text-muted);">
                                 @if($key->last_used_at)

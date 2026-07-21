@@ -10,7 +10,11 @@ class ApiKeyController extends Controller
 {
     public function index()
     {
-        $keys = auth()->user()->apiKeys()->latest()->get();
+        if (auth()->user()->isAdmin()) {
+            $keys = ApiKey::with('user')->latest()->get();
+        } else {
+            $keys = auth()->user()->apiKeys()->latest()->get();
+        }
         
         if (auth()->user()->isAdmin()) {
             $logs = \App\Models\Log::with('user')
@@ -56,7 +60,7 @@ class ApiKeyController extends Controller
 
     public function destroy(ApiKey $apiKey)
     {
-        if ($apiKey->user_id !== auth()->id()) {
+        if ($apiKey->user_id !== auth()->id() && !auth()->user()->isAdmin()) {
             abort(403);
         }
 
